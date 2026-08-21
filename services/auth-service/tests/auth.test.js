@@ -265,4 +265,20 @@ describe("auth-service HTTP", { concurrency: false }, () => {
     assert.equal(status, 200);
     assert.equal(body.success, true);
   });
+
+  it("creates a provider from a verified Google profile", async () => {
+    const { setGoogleTokenVerifier } = require("../src/services/googleAuth");
+    setGoogleTokenVerifier(async () => ({
+      email: "google.user@example.com",
+      name: "Google User",
+    }));
+    const { status, body } = await request(server.url, "POST", "/auth/google", {
+      body: { idToken: "a-valid-looking-google-id-token-value", role: "Provider" },
+    });
+    setGoogleTokenVerifier(null);
+    assert.equal(status, 200);
+    assert.equal(body.data.user.email, "google.user@example.com");
+    assert.equal(body.data.user.role, "Provider");
+    assert.equal(typeof body.data.accessToken, "string");
+  });
 });

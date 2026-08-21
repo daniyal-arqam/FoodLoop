@@ -7,6 +7,7 @@ import { clearAccessToken, resetTokenStore } from "../services/tokenStore.js";
 
 vi.mock("../services/authService.js", () => ({
   loginAccount: vi.fn(),
+  loginWithGoogleAccount: vi.fn(),
   registerAccount: vi.fn(),
   fetchCurrentUser: vi.fn(),
   logoutAccount: vi.fn(),

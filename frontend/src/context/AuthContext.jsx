@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { fetchCurrentUser, loginAccount, logoutAccount, registerAccount } from "../services/authService.js";
+import { fetchCurrentUser, loginAccount, loginWithGoogleAccount, logoutAccount, registerAccount } from "../services/authService.js";
 import { onUnauthorized } from "../services/apiClient.js";
 import { clearAccessToken, getAccessToken, setAccessToken } from "../services/tokenStore.js";
 import { ApiError, errorMessage } from "../utils/errors.js";
@@ -86,6 +86,13 @@ export function AuthProvider({ children }) {
     return currentUser;
   }, []);
 
+  const loginWithGoogle = useCallback(async ({ idToken, role }) => {
+    const payload = await loginWithGoogleAccount({ idToken, role });
+    const currentUser = applySession(payload.data.user, payload.data.accessToken);
+    setUser(currentUser);
+    return currentUser;
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       if (getAccessToken()) {
@@ -105,13 +112,14 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: Boolean(user),
       login,
+      loginWithGoogle,
       register,
       logout,
       refreshCurrentUser,
       hasRole: (roles) => userHasRole(user, roles),
       errorMessage,
     }),
-    [user, loading, login, register, logout, refreshCurrentUser]
+    [user, loading, login, loginWithGoogle, register, logout, refreshCurrentUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

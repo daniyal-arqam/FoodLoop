@@ -9,7 +9,7 @@ import { USER_ROLES } from "../utils/constants.js";
 const login = vi.fn();
 
 vi.mock("../hooks/useAuth.js", () => ({
-  useAuth: () => ({ login }),
+  useAuth: () => ({ login, loginWithGoogle: vi.fn() }),
 }));
 
 function renderLogin() {
@@ -49,13 +49,5 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText("Password"), "WrongPass1");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Invalid email or password");
-  });
-
-  it("fills a seeded provider account from the demo shortcuts", async () => {
-    const user = userEvent.setup();
-    renderLogin();
-    await user.click(screen.getByRole("button", { name: "Provider" }));
-    expect(screen.getByLabelText("Email")).toHaveValue("ayesha.provider@example.com");
-    expect(screen.getByLabelText("Password")).toHaveValue("Password1");
   });
 });

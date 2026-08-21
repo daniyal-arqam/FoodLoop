@@ -63,7 +63,26 @@ function validateLogin(req, _res, next) {
   return next();
 }
 
+function validateGoogleLogin(req, _res, next) {
+  const { idToken, role } = req.body || {};
+  const errors = collectErrors([
+    !idToken || typeof idToken !== "string" || idToken.trim().length < 20
+      ? "idToken is required"
+      : null,
+    role != null && role !== "" && !PUBLIC_REGISTRATION_ROLES.includes(role)
+      ? "role must be Provider or Organization"
+      : null,
+  ]);
+
+  if (errors.length) {
+    return next(new AppError("Validation failed", 400, { errors }));
+  }
+
+  return next();
+}
+
 module.exports = {
   validateRegister,
   validateLogin,
+  validateGoogleLogin,
 };

@@ -8,6 +8,7 @@ import { postAuthPath } from "../utils/roles.js";
 import { Card } from "../components/ui/Card.jsx";
 import { Input, Select } from "../components/ui/FormFields.jsx";
 import { Button } from "../components/ui/Button.jsx";
+import { GoogleSignIn } from "../components/auth/GoogleSignIn.jsx";
 
 const ROLE_LABELS = {
   [USER_ROLES.PROVIDER]: "Provider",
@@ -97,10 +98,20 @@ export function RegisterPage() {
         <Button type="submit" variant="primary" disabled={submitting} aria-busy={submitting}>
           {submitting ? "Creating account…" : "Register"}
         </Button>
-        <p className="muted">
-          Already registered? <Link to="/login">Sign in</Link>. Admin accounts cannot be registered here.
-        </p>
       </form>
+      <div className="auth-divider">
+        <span>or</span>
+      </div>
+      <GoogleSignIn
+        role={form.role}
+        onSignedIn={(currentUser) => {
+          toast.success("Signed in");
+          navigate(postAuthPath(currentUser), { replace: true });
+        }}
+      />
+      <p className="muted">
+        Already registered? <Link to="/login">Sign in</Link>.
+      </p>
     </Card>
   );
 }

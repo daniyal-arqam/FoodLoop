@@ -1,26 +1,89 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth.js";
-import { useAsyncResource } from "../hooks/useAsyncResource.js";
-import { getFrontendHealth, getGatewayHealth } from "../services/healthService.js";
 import { dashboardPathForRole } from "../utils/roles.js";
 import { Card } from "../components/ui/Card.jsx";
-import { Badge } from "../components/ui/Badge.jsx";
-import { DEMO_ACCOUNTS } from "../utils/demoAccounts.js";
+import { GoogleSignIn } from "../components/auth/GoogleSignIn.jsx";
+
+function HeroStage() {
+  const stageRef = useRef(null);
+  const [tilt, setTilt] = useState({ x: 10, y: -16 });
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setTilt({ x: 0, y: 0 });
+    }
+  }, []);
+
+  function handleMove(event) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+    const box = stageRef.current?.getBoundingClientRect();
+    if (!box) return;
+    const px = (event.clientX - box.left) / box.width - 0.5;
+    const py = (event.clientY - box.top) / box.height - 0.5;
+    setTilt({ x: 8 - py * 14, y: -12 + px * 22 });
+  }
+
+  function handleLeave() {
+    setTilt({ x: 10, y: -16 });
+  }
+
+  return (
+    <div
+      className="hero-stage"
+      ref={stageRef}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      aria-hidden="true"
+    >
+      <div className="hero-orb hero-orb-a" />
+      <div className="hero-orb hero-orb-b" />
+      <div
+        className="hero-stack"
+        style={{
+          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        }}
+      >
+        <article className="hero-float-card hero-float-back">
+          <p className="muted">Tonight’s leftover</p>
+          <p className="hero-metric">40</p>
+          <p className="muted">portions still edible</p>
+        </article>
+        <article className="hero-float-card hero-float-mid">
+          <p className="muted">A kitchen two streets over</p>
+          <strong>Needs dinner by 8pm</strong>
+          <p className="muted">Verified · ready to collect</p>
+        </article>
+        <article className="hero-float-card hero-float-front">
+          <p className="muted">The loop</p>
+          <ol className="hero-steps">
+            <li>List what would be wasted.</li>
+            <li>Match the nearest trusted org.</li>
+            <li>Collect before it expires.</li>
+          </ol>
+        </article>
+      </div>
+    </div>
+  );
+}
 
 export function HomePage() {
   const { user, isAuthenticated } = useAuth();
-  const frontend = useAsyncResource(getFrontendHealth, []);
-  const gateway = useAsyncResource(getGatewayHealth, []);
+  const navigate = useNavigate();
 
   return (
     <div className="home-page">
       <section className="hero">
         <div className="hero-copy">
-          <p className="badge badge-success">Smart food rescue · PS-04</p>
-          <h1 className="display hero-title">Surplus food, looped back to people who need it.</h1>
+          <p className="badge badge-success">Food rescue, in one loop</p>
+          <h1 className="display hero-title">The meal that almost went to waste can still reach a table tonight.</h1>
           <p className="lede">
-            FoodLoop connects kitchens with verified community organizations so edible surplus is claimed before it
-            expires — not left in a chat thread.
+            Kitchens close with trays left over. Nearby community organizations are still looking for food. FoodLoop is
+            the quiet coordination layer in between — list surplus, match a trusted claimant, and close the loop before
+            the clock runs out.
           </p>
           <div className="row hero-actions">
             {isAuthenticated ? (
@@ -30,7 +93,7 @@ export function HomePage() {
             ) : (
               <>
                 <Link className="btn btn-primary" to="/register">
-                  Create an account
+                  Start rescuing food
                 </Link>
                 <Link className="btn btn-ghost" to="/login">
                   Sign in
@@ -39,85 +102,52 @@ export function HomePage() {
             )}
           </div>
         </div>
-
-        <div className="hero-stage" aria-hidden="true">
-          <div className="hero-orb hero-orb-a" />
-          <div className="hero-orb hero-orb-b" />
-          <div className="hero-stack">
-            <article className="hero-float-card hero-float-back">
-              <p className="muted">Match score</p>
-              <p className="hero-metric">92</p>
-              <p className="muted">Distance · category · urgency</p>
-            </article>
-            <article className="hero-float-card hero-float-mid">
-              <p className="muted">Listing</p>
-              <strong>Vegetarian meal trays</strong>
-              <p className="muted">Available · 40 portions</p>
-            </article>
-            <article className="hero-float-card hero-float-front">
-              <p className="muted">How it works</p>
-              <ol className="hero-steps">
-                <li>Providers publish surplus.</li>
-                <li>Verified orgs claim nearby food.</li>
-                <li>Python matcher ranks the fit.</li>
-              </ol>
-            </article>
-          </div>
-        </div>
+        <HeroStage />
       </section>
 
-      <section className="grid-3 home-pillars" aria-label="Platform pillars">
-        <Card title="List & rescue">
-          <p className="muted">Providers post quantity, category, pickup window, and expiry. Status moves Available → Reserved → Collected.</p>
+      <section className="story-grid" aria-label="How FoodLoop works">
+        <Card title="Tonight’s surplus">
+          <p className="muted">
+            A cafeteria, restaurant, or household publishes what is still safe to eat — how much, what kind, where to
+            pick it up, and when it expires.
+          </p>
         </Card>
-        <Card title="Verified claimants">
-          <p className="muted">Organizations wait for Admin verification, then browse, score, and collect surplus food.</p>
+        <Card title="A trusted neighbor">
+          <p className="muted">
+            Verified community organizations see nearby listings, a match score, and a clear claim path. No marketplace.
+            No payments. Just coordination.
+          </p>
         </Card>
-        <Card title="Live AI workspace">
-          <p className="muted">Waste advisor, food-safety RAG, and a matching agent that calls the same APIs — not a mocked chatbot.</p>
+        <Card title="The loop closes">
+          <p className="muted">
+            Status moves from available to reserved to collected. Advisories and matching help sit on the same live
+            records, so guidance is about real food still in the system.
+          </p>
         </Card>
       </section>
 
-      <Card title="Hackathon demo login">
-        <p className="muted">Use these accounts on the live app after seed, or locally after `./scripts/seed-demo.sh`.</p>
-        <ul className="stack">
-          <li>
-            Provider: {DEMO_ACCOUNTS.provider.email} / {DEMO_ACCOUNTS.provider.password}
-          </li>
-          <li>
-            Organization: {DEMO_ACCOUNTS.organization.email} / {DEMO_ACCOUNTS.organization.password}
-          </li>
-          <li>
-            Admin: {DEMO_ACCOUNTS.admin.email} / {DEMO_ACCOUNTS.admin.password}
-          </li>
-        </ul>
-      </Card>
-
-      <div className="grid-2">
-        <Card title="Frontend">
-          {frontend.loading && <p role="status">Checking health…</p>}
-          {frontend.error && <p role="alert">{frontend.error}</p>}
-          {frontend.data && (
-            <p>
-              <Badge tone="success">{frontend.data.data?.status || "ok"}</Badge> {frontend.data.data?.service}
-            </p>
-          )}
+      <section className="story-close">
+        <Card>
+          <h2 className="display story-close-title">Waste is a logistics problem. Treat it like one.</h2>
+          <p className="lede">
+            If you cook more than you can serve, list it. If you feed a neighborhood, claim it. FoodLoop keeps both
+            sides on the same timeline.
+          </p>
+          {!isAuthenticated ? (
+            <div className="stack">
+              <div className="row hero-actions">
+                <Link className="btn btn-primary" to="/register">
+                  Create an account
+                </Link>
+                <Link className="btn btn-ghost" to="/login">
+                  Continue with email
+                </Link>
+              </div>
+              <GoogleSignIn onSignedIn={(nextUser) => navigate(dashboardPathForRole(nextUser.role), { replace: true })} />
+            </div>
+          ) : null}
         </Card>
-        <Card title="API gateway">
-          {gateway.loading && <p role="status">Checking gateway…</p>}
-          {gateway.error && (
-            <p role="alert">
-              Gateway is waking up or unreachable. Wait a few seconds, then refresh. Confirm <code>VITE_API_BASE_URL</code>{" "}
-              if this persists.
-            </p>
-          )}
-          {gateway.data && (
-            <p>
-              <Badge tone="success">{gateway.data.data?.status || "ok"}</Badge> {gateway.data.data?.service}
-            </p>
-          )}
-        </Card>
-      </div>
+      </section>
     </div>
   );
 }

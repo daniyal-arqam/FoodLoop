@@ -49,6 +49,7 @@ services:
       MONGODB_URI: mongodb://mongodb:27017/foodloop
       JWT_SECRET: ${JWT_SECRET:-foodloop-local-dev-secret}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -226,6 +227,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
     image: foodloop-frontend
     container_name: foodloop-frontend
     restart: unless-stopped

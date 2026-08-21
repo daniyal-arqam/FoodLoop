@@ -11,6 +11,11 @@ async function login(req, res) {
   return sendSuccess(res, result, "Login successful");
 }
 
+async function loginWithGoogle(req, res) {
+  const result = await authService.loginWithGoogle(req.body);
+  return sendSuccess(res, result, "Login successful");
+}
+
 async function me(req, res) {
   const user = authService.getCurrentUser(req.user.user);
   return sendSuccess(res, { user }, "Authenticated user");
@@ -41,6 +46,7 @@ async function setUserActive(req, res) {
 module.exports = {
   register,
   login,
+  loginWithGoogle,
   me,
   logout,
   listUsers,

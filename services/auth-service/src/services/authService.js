@@ -1,7 +1,9 @@
+const crypto = require("crypto");
 const User = require("../models/User");
 const { PUBLIC_REGISTRATION_ROLES, USER_ROLES } = require("../../../shared/constants");
 const { hashPassword, comparePassword } = require("./passwordService");
 const { signAccessToken } = require("./tokenService");
+const { verifyGoogleIdToken } = require("./googleAuth");
 const { toPublicUser } = require("../utils/userSerializer");
 const AppError = require("../utils/AppError");
 
@@ -55,6 +57,32 @@ async function login({ email, password }) {
   };
 }
 
+async function loginWithGoogle({ idToken, role }) {
+  const profile = await verifyGoogleIdToken(idToken);
+  let user = await User.findOne({ email: profile.email });
+
+  if (!user) {
+    const nextRole = PUBLIC_REGISTRATION_ROLES.includes(role) ? role : USER_ROLES.PROVIDER;
+    const name = (profile.name || profile.email.split("@")[0]).slice(0, 100);
+    user = await User.create({
+      name: name.length >= 2 ? name : "Google user",
+      email: profile.email,
+      passwordHash: await hashPassword(crypto.randomBytes(32).toString("hex")),
+      role: nextRole,
+      isVerified: true,
+    });
+  }
+
+  if (!user.isActive) {
+    throw new AppError("Account is disabled", 403);
+  }
+
+  return {
+    user: toPublicUser(user),
+    accessToken: signAccessToken(user),
+  };
+}
+
 function getCurrentUser(user) {
   return toPublicUser(user);
 }
@@ -83,6 +111,7 @@ async function setUserActive(actorUserId, targetId, isActive) {
 module.exports = {
   register,
   login,
+  loginWithGoogle,
   getCurrentUser,
   listUsers,
   setUserActive,

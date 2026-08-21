@@ -4,10 +4,11 @@ import { useAuth } from "../hooks/useAuth.js";
 import { useToast } from "../hooks/useToast.js";
 import { errorMessage } from "../utils/errors.js";
 import { postAuthPath } from "../utils/roles.js";
-import { DEMO_ACCOUNT_LIST } from "../utils/demoAccounts.js";
+import { USER_ROLES } from "../utils/constants.js";
 import { Card } from "../components/ui/Card.jsx";
-import { Input } from "../components/ui/FormFields.jsx";
+import { Input, Select } from "../components/ui/FormFields.jsx";
 import { Button } from "../components/ui/Button.jsx";
+import { GoogleSignIn } from "../components/auth/GoogleSignIn.jsx";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -15,6 +16,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [googleRole, setGoogleRole] = useState(USER_ROLES.PROVIDER);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -64,25 +66,29 @@ export function LoginPage() {
         <Button type="submit" variant="primary" disabled={submitting} aria-busy={submitting}>
           {submitting ? "Signing in…" : "Sign in"}
         </Button>
-        <p className="muted">
-          Admins sign in here. New providers and organizations can <Link to="/register">create an account</Link>.
-        </p>
       </form>
-      <div className="demo-accounts">
-        <p className="muted">Demo shortcuts (live or after seed)</p>
-        <div className="row" style={{ flexWrap: "wrap" }}>
-          {DEMO_ACCOUNT_LIST.map((account) => (
-            <Button
-              key={account.email}
-              type="button"
-              variant="ghost"
-              onClick={() => setForm({ email: account.email, password: account.password })}
-            >
-              {account.label}
-            </Button>
-          ))}
-        </div>
+      <div className="auth-divider">
+        <span>or</span>
       </div>
+      <Select
+        id="google-role"
+        label="Continue with Google as"
+        value={googleRole}
+        onChange={(event) => setGoogleRole(event.target.value)}
+      >
+        <option value={USER_ROLES.PROVIDER}>Provider</option>
+        <option value={USER_ROLES.ORGANIZATION}>Organization</option>
+      </Select>
+      <GoogleSignIn
+        role={googleRole}
+        onSignedIn={(currentUser) => {
+          toast.success("Signed in");
+          navigate(postAuthPath(currentUser, location.state?.from), { replace: true });
+        }}
+      />
+      <p className="muted">
+        New here? <Link to="/register">Create an account</Link>.
+      </p>
     </Card>
   );
 }

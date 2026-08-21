@@ -8,6 +8,10 @@ export function loginAccount({ email, password }) {
   return apiClient.post("/api/auth/login", { email, password }, { auth: false });
 }
 
+export function loginWithGoogleAccount({ idToken, role }) {
+  return apiClient.post("/api/auth/google", { idToken, role }, { auth: false });
+}
+
 export function fetchCurrentUser() {
   return apiClient.get("/api/auth/me", { skipUnauthorized: true });
 }

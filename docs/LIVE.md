@@ -51,10 +51,23 @@ If a service is **OOM** (often `foodloop-ai` on 512 MB), bump only that service 
 | Name | Value |
 |------|--------|
 | `VITE_API_BASE_URL` | the Render gateway URL, no trailing slash |
+| `VITE_GOOGLE_CLIENT_ID` | Google Cloud OAuth Web client ID (same value as auth `GOOGLE_CLIENT_ID`) |
 
 6. Deploy. Copy the frontend URL, for example `https://foodloop-xxx.vercel.app`.
 
 If you set `VITE_API_BASE_URL` after the first deploy, **Redeploy** so Vite bakes the gateway URL into the JS bundle.
+
+## 4b. Continue with Google
+
+Google sign-in is real OAuth (ID token → auth-service). It is not a mock button.
+
+1. Open [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials → Create credentials → **OAuth client ID** → Application type **Web application**.
+2. Authorized JavaScript origins: `http://localhost:5173` and your Vercel URL (no trailing slash).
+3. Copy the Client ID.
+4. Vercel → Project → Settings → Environment Variables → `VITE_GOOGLE_CLIENT_ID` = that Client ID → Redeploy.
+5. Render → `foodloop-auth` → Environment → `GOOGLE_CLIENT_ID` = the **same** Client ID → Save (auth service restarts).
+
+New Google users are created as Provider unless they pick Organization on Sign in / Register first. Existing email accounts with the same Google email are signed in without changing role.
 
 ## 5. Seed demo accounts
 

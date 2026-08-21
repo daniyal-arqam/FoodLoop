@@ -8,6 +8,7 @@ import { ToastProvider } from "../context/ToastContext.jsx";
 vi.mock("../hooks/useAuth.js", () => ({
   useAuth: () => ({
     register: vi.fn(),
+    loginWithGoogle: vi.fn(),
   }),
 }));
 

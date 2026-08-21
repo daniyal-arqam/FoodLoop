@@ -806,6 +806,7 @@ th {
   .hero,
   .grid-2,
   .grid-3,
+  .story-grid,
   .sidebar-layout,
   .details-list {
     grid-template-columns: 1fr;
@@ -856,6 +857,9 @@ th {
 
 .hero-actions {
   margin-top: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
 }
 
 .hero-stage {
@@ -897,7 +901,7 @@ th {
   height: 18rem;
   transform-style: preserve-3d;
   transform: rotateY(-16deg) rotateX(10deg);
-  animation: stack-float 7s ease-in-out infinite;
+  transition: transform 0.18s ease-out;
 }
 
 .hero-float-card {
@@ -917,16 +921,19 @@ th {
   top: 0;
   transform: translateZ(-72px) translateY(-0.4rem);
   opacity: 0.72;
+  animation: card-lift-back 6.5s ease-in-out infinite;
 }
 
 .hero-float-mid {
   top: 3.4rem;
   transform: translateZ(-28px);
+  animation: card-lift-mid 5.8s ease-in-out infinite;
 }
 
 .hero-float-front {
   top: 7.2rem;
   transform: translateZ(36px);
+  animation: card-lift-front 5.2s ease-in-out infinite;
 }
 
 .hero-metric {
@@ -947,7 +954,61 @@ th {
   margin: 0.25rem 0 1rem;
 }
 
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.story-grid .card {
+  height: 100%;
+  margin: 0;
+}
+
+.story-close {
+  margin-top: 1rem;
+}
+
+.story-close-title {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.auth-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1.1rem 0 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  background: var(--border);
+}
+
+.google-sign-in {
+  display: flex;
+  justify-content: center;
+  min-height: 2.75rem;
+}
+
+.google-signin-hint {
+  text-align: center;
+}
+
 .auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
   transform: perspective(1200px) rotateX(2deg);
   animation: page-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -998,9 +1059,40 @@ th {
   }
 }
 
+@keyframes card-lift-back {
+  0%,
+  100% {
+    transform: translateZ(-72px) translateY(-0.4rem);
+  }
+  50% {
+    transform: translateZ(-72px) translateY(-0.9rem);
+  }
+}
+
+@keyframes card-lift-mid {
+  0%,
+  100% {
+    transform: translateZ(-28px) translateY(0);
+  }
+  50% {
+    transform: translateZ(-28px) translateY(-0.55rem);
+  }
+}
+
+@keyframes card-lift-front {
+  0%,
+  100% {
+    transform: translateZ(36px) translateY(0);
+  }
+  50% {
+    transform: translateZ(36px) translateY(-0.7rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-stack,
   .hero-orb,
+  .hero-float-card,
   .page-enter,
   .auth-card,
   .toast,

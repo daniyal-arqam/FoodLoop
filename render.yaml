@@ -29,6 +29,8 @@ services:
         value: auth-service
       - key: MONGODB_URI
         sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
 
   - type: web
     name: foodloop-food

@@ -1,5 +1,5 @@
 function isLoginOrRegister(req) {
-  return req.method === "POST" && (req.path === "/register" || req.path === "/login");
+  return req.method === "POST" && (req.path === "/register" || req.path === "/login" || req.path === "/google");
 }
 
 function createRateLimiter({ windowMs, max, getKey, skip }) {

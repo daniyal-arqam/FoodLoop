@@ -42,7 +42,8 @@ function unless(predicate, middleware) {
 function isPublicAuthRoute(req) {
   return (
     (req.method === "POST" && req.path === "/register") ||
-    (req.method === "POST" && req.path === "/login")
+    (req.method === "POST" && req.path === "/login") ||
+    (req.method === "POST" && req.path === "/google")
   );
 }
 
