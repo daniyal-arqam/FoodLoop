@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: foodloop
+  labels:
+    app: auth-service
+    app.kubernetes.io/part-of: foodloop
+spec:
+  type: ClusterIP
+  selector:
+    app: auth-service
+  ports:
+    - name: http
+      port: 4001
+      targetPort: http

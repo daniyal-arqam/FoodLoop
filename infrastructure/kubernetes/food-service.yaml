@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: food-service
+  namespace: foodloop
+  labels:
+    app: food-service
+    app.kubernetes.io/part-of: foodloop
+spec:
+  type: ClusterIP
+  selector:
+    app: food-service
+  ports:
+    - name: http
+      port: 4002
+      targetPort: http

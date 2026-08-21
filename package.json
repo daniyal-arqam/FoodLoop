@@ -1,0 +1,13 @@
+{
+  "name": "foodloop",
+  "private": true,
+  "scripts": {
+    "test:e2e": "node --test --test-concurrency=1 tests/e2e/**/*.test.js",
+    "test:frontend": "npm test --prefix frontend",
+    "test:auth": "npm test --prefix services/auth-service",
+    "test:food": "npm test --prefix services/food-service",
+    "test:organization": "npm test --prefix services/organization-service",
+    "test:gateway": "npm test --prefix services/api-gateway",
+    "test:ai": "cd ai-service && .venv\\Scripts\\python.exe -m pytest"
+  }
+}

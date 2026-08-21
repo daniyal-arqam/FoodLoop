@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: foodloop
+  labels:
+    app.kubernetes.io/part-of: foodloop
+    app.kubernetes.io/name: foodloop

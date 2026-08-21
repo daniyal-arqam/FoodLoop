@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: foodloop
+  labels:
+    app: api-gateway
+    app.kubernetes.io/part-of: foodloop
+    app.kubernetes.io/name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+        app.kubernetes.io/part-of: foodloop
+    spec:
+      containers:
+        - name: api-gateway
+          image: foodloop-api-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: NODE_ENV
+            - name: PORT
+              value: "8080"
+            - name: SERVICE_NAME
+              value: api-gateway
+            - name: AUTH_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: AUTH_SERVICE_URL
+            - name: FOOD_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: FOOD_SERVICE_URL
+            - name: ORGANIZATION_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: ORGANIZATION_SERVICE_URL
+            - name: MATCHER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCHER_URL
+            - name: AI_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: AI_SERVICE_URL
+            - name: CORS_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: CORS_ORIGINS
+            - name: PROXY_TIMEOUT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: PROXY_TIMEOUT_MS
+            - name: AI_PROXY_TIMEOUT_MS
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: AI_PROXY_TIMEOUT_MS
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: foodloop-secrets
+                  key: JWT_SECRET
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

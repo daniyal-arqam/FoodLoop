@@ -1,0 +1,244 @@
+name: foodloop
+
+networks:
+  foodloop:
+    driver: bridge
+
+volumes:
+  foodloop_mongo_data:
+
+x-node-health: &node-health
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 20s
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: foodloop-mongodb
+    restart: unless-stopped
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - foodloop_mongo_data:/data/db
+    networks:
+      - foodloop
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    image: foodloop-auth-service
+    container_name: foodloop-auth-service
+    restart: unless-stopped
+    expose:
+      - "4001"
+    ports:
+      - "${AUTH_SERVICE_PORT:-4001}:4001"
+    environment:
+      NODE_ENV: production
+      PORT: 4001
+      SERVICE_NAME: auth-service
+      MONGODB_URI: mongodb://mongodb:27017/foodloop
+      JWT_SECRET: ${JWT_SECRET:-foodloop-local-dev-secret}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - foodloop
+    healthcheck:
+      <<: *node-health
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+
+  food-service:
+    build:
+      context: .
+      dockerfile: services/food-service/Dockerfile
+    image: foodloop-food-service
+    container_name: foodloop-food-service
+    restart: unless-stopped
+    expose:
+      - "4002"
+    ports:
+      - "${FOOD_SERVICE_PORT:-4002}:4002"
+    environment:
+      NODE_ENV: production
+      PORT: 4002
+      SERVICE_NAME: food-service
+      MONGODB_URI: mongodb://mongodb:27017/foodloop
+      JWT_SECRET: ${JWT_SECRET:-foodloop-local-dev-secret}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - foodloop
+    healthcheck:
+      <<: *node-health
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4002/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+
+  organization-service:
+    build:
+      context: .
+      dockerfile: services/organization-service/Dockerfile
+    image: foodloop-organization-service
+    container_name: foodloop-organization-service
+    restart: unless-stopped
+    expose:
+      - "4003"
+    ports:
+      - "${ORGANIZATION_SERVICE_PORT:-4003}:4003"
+    environment:
+      NODE_ENV: production
+      PORT: 4003
+      SERVICE_NAME: organization-service
+      MONGODB_URI: mongodb://mongodb:27017/foodloop
+      JWT_SECRET: ${JWT_SECRET:-foodloop-local-dev-secret}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - foodloop
+    healthcheck:
+      <<: *node-health
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4003/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+
+  python-matcher:
+    build:
+      context: ./python-services/matcher
+      dockerfile: Dockerfile
+    image: foodloop-python-matcher
+    container_name: foodloop-python-matcher
+    restart: unless-stopped
+    expose:
+      - "8001"
+    ports:
+      - "${MATCHER_PORT:-8001}:8001"
+    environment:
+      PORT: 8001
+      SERVICE_NAME: matcher
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      MATCH_MAX_DISTANCE_KM: ${MATCH_MAX_DISTANCE_KM:-50}
+      MATCH_URGENCY_WINDOW_HOURS: ${MATCH_URGENCY_WINDOW_HOURS:-72}
+      MATCH_MIN_QUANTITY_RATIO: ${MATCH_MIN_QUANTITY_RATIO:-0.2}
+    networks:
+      - foodloop
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    image: foodloop-ai-service
+    container_name: foodloop-ai-service
+    restart: unless-stopped
+    expose:
+      - "8002"
+    ports:
+      - "${AI_SERVICE_PORT:-8002}:8002"
+    environment:
+      PORT: 8002
+      SERVICE_NAME: ai-service
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      FOOD_SERVICE_URL: http://food-service:4002
+      ORGANIZATION_SERVICE_URL: http://organization-service:4003
+      MATCHER_URL: http://python-matcher:8001
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      AI_TIMEOUT_SECONDS: ${AI_TIMEOUT_SECONDS:-25}
+      FOODLOOP_TIMEOUT_SECONDS: ${FOODLOOP_TIMEOUT_SECONDS:-10}
+      AGENT_MAX_STEPS: ${AGENT_MAX_STEPS:-8}
+    depends_on:
+      food-service:
+        condition: service_healthy
+      organization-service:
+        condition: service_healthy
+      python-matcher:
+        condition: service_healthy
+    networks:
+      - foodloop
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile
+    image: foodloop-api-gateway
+    container_name: foodloop-api-gateway
+    restart: unless-stopped
+    expose:
+      - "8080"
+    ports:
+      - "${GATEWAY_PORT:-8080}:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      SERVICE_NAME: api-gateway
+      AUTH_SERVICE_URL: http://auth-service:4001
+      FOOD_SERVICE_URL: http://food-service:4002
+      ORGANIZATION_SERVICE_URL: http://organization-service:4003
+      MATCHER_URL: http://python-matcher:8001
+      AI_SERVICE_URL: http://ai-service:8002
+      JWT_SECRET: ${JWT_SECRET:-foodloop-local-dev-secret}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      PROXY_TIMEOUT_MS: ${PROXY_TIMEOUT_MS:-10000}
+      AI_PROXY_TIMEOUT_MS: ${AI_PROXY_TIMEOUT_MS:-30000}
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      food-service:
+        condition: service_healthy
+      organization-service:
+        condition: service_healthy
+      python-matcher:
+        condition: service_healthy
+      ai-service:
+        condition: service_healthy
+    networks:
+      - foodloop
+    healthcheck:
+      <<: *node-health
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+    image: foodloop-frontend
+    container_name: foodloop-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    networks:
+      - foodloop
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health.json"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s

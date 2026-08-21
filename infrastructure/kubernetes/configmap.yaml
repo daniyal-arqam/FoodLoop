@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foodloop-config
+  namespace: foodloop
+  labels:
+    app.kubernetes.io/part-of: foodloop
+    app.kubernetes.io/name: foodloop-config
+data:
+  NODE_ENV: "production"
+  JWT_EXPIRES_IN: "1d"
+  # Reflect any Origin without cookies. Set an explicit origin list in production.
+  CORS_ORIGINS: "*"
+  MONGODB_URI: "mongodb://mongodb:27017/foodloop"
+  AUTH_SERVICE_URL: "http://auth-service:4001"
+  FOOD_SERVICE_URL: "http://food-service:4002"
+  ORGANIZATION_SERVICE_URL: "http://organization-service:4003"
+  MATCHER_URL: "http://matcher:8001"
+  AI_SERVICE_URL: "http://ai-service:8002"
+  PROXY_TIMEOUT_MS: "10000"
+  AI_PROXY_TIMEOUT_MS: "30000"
+  OPENAI_BASE_URL: "https://api.openai.com/v1"
+  OPENAI_MODEL: "gpt-4o-mini"
+  AI_TIMEOUT_SECONDS: "25"
+  FOODLOOP_TIMEOUT_SECONDS: "10"
+  AGENT_MAX_STEPS: "8"
+  MATCH_MAX_DISTANCE_KM: "50"
+  MATCH_URGENCY_WINDOW_HOURS: "72"
+  MATCH_MIN_QUANTITY_RATIO: "0.2"
+  MATCH_WEIGHT_DISTANCE: "0.35"
+  MATCH_WEIGHT_QUANTITY: "0.25"
+  MATCH_WEIGHT_CATEGORY: "0.20"
+  MATCH_WEIGHT_URGENCY: "0.20"

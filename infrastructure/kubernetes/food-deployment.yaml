@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: food-service
+  namespace: foodloop
+  labels:
+    app: food-service
+    app.kubernetes.io/part-of: foodloop
+    app.kubernetes.io/name: food-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: food-service
+  template:
+    metadata:
+      labels:
+        app: food-service
+        app.kubernetes.io/part-of: foodloop
+    spec:
+      initContainers:
+        - name: wait-for-mongodb
+          image: mongo:7
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - until mongosh --quiet --eval "db.adminCommand('ping').ok" mongodb://mongodb:27017/admin; do sleep 2; done
+      containers:
+        - name: food-service
+          image: foodloop-food-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 4002
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: NODE_ENV
+            - name: PORT
+              value: "4002"
+            - name: SERVICE_NAME
+              value: food-service
+            - name: MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MONGODB_URI
+            - name: JWT_EXPIRES_IN
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: JWT_EXPIRES_IN
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: foodloop-secrets
+                  key: JWT_SECRET
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 8
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

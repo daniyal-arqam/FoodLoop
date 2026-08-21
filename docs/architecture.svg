@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640">
+  <rect width="1100" height="640" fill="#f4f0e8"/>
+  <text x="40" y="40" font-family="Segoe UI, sans-serif" font-size="22" fill="#1c241d">FoodLoop architecture (PS-04)</text>
+  <text x="40" y="64" font-family="Segoe UI, sans-serif" font-size="13" fill="#5b675e">React talks only to the API gateway. JWT on /api/foods, /api/organizations, /api/matching, /api/ai.</text>
+  <g font-family="Segoe UI, sans-serif" font-size="14" text-anchor="middle">
+    <rect x="380" y="90" width="340" height="56" rx="8" fill="#fffdf8" stroke="#1f6b45" stroke-width="2"/>
+    <text x="550" y="124" fill="#1c241d">React frontend :5173</text>
+    <rect x="380" y="190" width="340" height="56" rx="8" fill="#dceee4" stroke="#1f6b45" stroke-width="2"/>
+    <text x="550" y="224" fill="#1c241d">API Gateway :8080</text>
+    <rect x="40" y="310" width="200" height="56" rx="8" fill="#fffdf8" stroke="#314038"/>
+    <text x="140" y="344" fill="#1c241d">Auth :4001</text>
+    <rect x="260" y="310" width="200" height="56" rx="8" fill="#fffdf8" stroke="#314038"/>
+    <text x="360" y="344" fill="#1c241d">Food :4002</text>
+    <rect x="480" y="310" width="220" height="56" rx="8" fill="#fffdf8" stroke="#314038"/>
+    <text x="590" y="344" fill="#1c241d">Organization :4003</text>
+    <rect x="720" y="310" width="160" height="56" rx="8" fill="#dceee4" stroke="#1f6b45"/>
+    <text x="800" y="344" fill="#1c241d">Matcher :8001</text>
+    <rect x="900" y="310" width="160" height="56" rx="8" fill="#dceee4" stroke="#1f6b45"/>
+    <text x="980" y="344" fill="#1c241d">AI :8002</text>
+    <rect x="380" y="430" width="340" height="56" rx="8" fill="#f8e4d6" stroke="#c45c26"/>
+    <text x="550" y="464" fill="#1c241d">MongoDB :27017</text>
+    <rect x="80" y="530" width="280" height="70" rx="8" fill="#fffdf8" stroke="#314038"/>
+    <text x="220" y="560" fill="#1c241d">FoodMatcher · WasteAnalyzer</text>
+    <text x="220" y="580" fill="#5b675e">SustainabilityCalculator</text>
+    <rect x="420" y="530" width="280" height="70" rx="8" fill="#fffdf8" stroke="#314038"/>
+    <text x="560" y="560" fill="#1c241d">Advisor · RAG · Agent</text>
+    <text x="560" y="580" fill="#5b675e">knowledge-base + FAISS</text>
+    <rect x="740" y="530" width="280" height="70" rx="8" fill="#fffdf8" stroke="#314038"/>
+    <text x="880" y="560" fill="#1c241d">User · Listing · Claim · Org</text>
+    <text x="880" y="580" fill="#5b675e">See database-schema.svg</text>
+  </g>
+  <g stroke="#1f6b45" stroke-width="2" fill="none">
+    <line x1="550" y1="146" x2="550" y2="190"/>
+    <line x1="550" y1="246" x2="550" y2="300"/>
+    <line x1="140" y1="300" x2="980" y2="300"/>
+    <line x1="550" y1="366" x2="550" y2="430"/>
+    <line x1="800" y1="366" x2="800" y2="530"/>
+    <line x1="980" y1="366" x2="980" y2="530"/>
+  </g>
+</svg>

@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matcher
+  namespace: foodloop
+  labels:
+    app: matcher
+    app.kubernetes.io/part-of: foodloop
+    app.kubernetes.io/name: matcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matcher
+  template:
+    metadata:
+      labels:
+        app: matcher
+        app.kubernetes.io/part-of: foodloop
+    spec:
+      containers:
+        - name: matcher
+          image: foodloop-python-matcher:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8001
+          env:
+            - name: PORT
+              value: "8001"
+            - name: SERVICE_NAME
+              value: matcher
+            - name: CORS_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: CORS_ORIGINS
+            - name: MATCH_MAX_DISTANCE_KM
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCH_MAX_DISTANCE_KM
+            - name: MATCH_URGENCY_WINDOW_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCH_URGENCY_WINDOW_HOURS
+            - name: MATCH_MIN_QUANTITY_RATIO
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCH_MIN_QUANTITY_RATIO
+            - name: MATCH_WEIGHT_DISTANCE
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCH_WEIGHT_DISTANCE
+            - name: MATCH_WEIGHT_QUANTITY
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCH_WEIGHT_QUANTITY
+            - name: MATCH_WEIGHT_CATEGORY
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCH_WEIGHT_CATEGORY
+            - name: MATCH_WEIGHT_URGENCY
+              valueFrom:
+                configMapKeyRef:
+                  name: foodloop-config
+                  key: MATCH_WEIGHT_URGENCY
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 8
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

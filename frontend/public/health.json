@@ -1,0 +1,8 @@
+{
+  "success": true,
+  "message": "Service is healthy",
+  "data": {
+    "service": "frontend",
+    "status": "ok"
+  }
+}

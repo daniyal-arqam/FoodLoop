@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560">
+  <rect width="1100" height="560" fill="#f4f0e8"/>
+  <text x="40" y="40" font-family="Segoe UI, sans-serif" font-size="22" fill="#1c241d">FoodLoop MongoDB schema</text>
+  <g font-family="Segoe UI, sans-serif" font-size="13">
+    <rect x="40" y="80" width="240" height="180" rx="8" fill="#fffdf8" stroke="#1f6b45" stroke-width="2"/>
+    <text x="56" y="108" font-size="16" fill="#1c241d">User</text>
+    <text x="56" y="132" fill="#5b675e">_id, name, email</text>
+    <text x="56" y="152" fill="#5b675e">passwordHash (bcrypt)</text>
+    <text x="56" y="172" fill="#5b675e">role, isActive</text>
+    <text x="56" y="192" fill="#5b675e">timestamps</text>
+    <rect x="360" y="80" width="280" height="200" rx="8" fill="#fffdf8" stroke="#1f6b45" stroke-width="2"/>
+    <text x="376" y="108" font-size="16" fill="#1c241d">Organization</text>
+    <text x="376" y="132" fill="#5b675e">_id, userId ’ User</text>
+    <text x="376" y="152" fill="#5b675e">organizationName, address</text>
+    <text x="376" y="172" fill="#5b675e">location lat/lng</text>
+    <text x="376" y="192" fill="#5b675e">foodCategoriesNeeded</text>
+    <text x="376" y="212" fill="#5b675e">requiredQuantity, verified</text>
+    <rect x="720" y="80" width="340" height="240" rx="8" fill="#fffdf8" stroke="#1f6b45" stroke-width="2"/>
+    <text x="736" y="108" font-size="16" fill="#1c241d">FoodListing</text>
+    <text x="736" y="132" fill="#5b675e">_id, providerId ’ User</text>
+    <text x="736" y="152" fill="#5b675e">foodName, category, quantity</text>
+    <text x="736" y="172" fill="#5b675e">pickupLocation, windows</text>
+    <text x="736" y="192" fill="#5b675e">expiryDate, status</text>
+    <text x="736" y="212" fill="#5b675e">reservedBy ’ Organization</text>
+    <text x="736" y="232" fill="#5b675e">claimedQuantity, claimedAt</text>
+    <text x="736" y="252" fill="#5b675e">collectedAt, timestamps</text>
+    <rect x="360" y="340" width="280" height="160" rx="8" fill="#dceee4" stroke="#1f6b45" stroke-width="2"/>
+    <text x="376" y="368" font-size="16" fill="#1c241d">Claim</text>
+    <text x="376" y="392" fill="#5b675e">_id</text>
+    <text x="376" y="412" fill="#5b675e">listingId ’ FoodListing</text>
+    <text x="376" y="432" fill="#5b675e">organizationId ’ Organization</text>
+    <text x="376" y="452" fill="#5b675e">quantity, status, collectedAt</text>
+  </g>
+  <g stroke="#c45c26" stroke-width="2" fill="none">
+    <line x1="280" y1="140" x2="360" y2="140"/>
+    <line x1="280" y1="160" x2="720" y2="160"/>
+    <line x1="500" y1="280" x2="500" y2="340"/>
+    <line x1="640" y1="420" x2="720" y2="220"/>
+  </g>
+</svg>

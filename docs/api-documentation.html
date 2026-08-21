@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FoodLoop API documentation</title>
+  <style>
+    body { font-family: Segoe UI, sans-serif; max-width: 900px; margin: 2rem auto; color: #1c241d; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #d8d0c0; padding: 0.4rem 0.6rem; text-align: left; font-size: 0.9rem; }
+    th { background: #ece6d8; }
+    code { font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>FoodLoop API documentation</h1>
+  <p>Public clients call the <strong>API gateway</strong> only (<code>http://localhost:8080</code>). Envelope: <code>{ success, message, data }</code>. Authenticated routes: <code>Authorization: Bearer JWT</code>.</p>
+  <h2>Auth /api/auth</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr>
+    <tr><td>POST</td><td>/api/auth/register</td><td>No</td><td>Provider or Organization. Admin rejected.</td></tr>
+    <tr><td>POST</td><td>/api/auth/login</td><td>No</td><td>Returns accessToken</td></tr>
+    <tr><td>POST</td><td>/api/auth/logout</td><td>Yes</td><td>Client discards token</td></tr>
+    <tr><td>GET</td><td>/api/auth/me</td><td>Yes</td><td>Current user</td></tr>
+    <tr><td>GET</td><td>/api/auth/admin/users</td><td>Admin</td><td>List users</td></tr>
+    <tr><td>PATCH</td><td>/api/auth/admin/users/:id</td><td>Admin</td><td>Activate/deactivate</td></tr>
+  </table>
+  <h2>Food /api/foods</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr>
+    <tr><td>POST</td><td>/api/foods</td><td>Provider</td><td>Create Available listing</td></tr>
+    <tr><td>GET</td><td>/api/foods</td><td>Yes</td><td>Search/filter</td></tr>
+    <tr><td>GET</td><td>/api/foods/:id</td><td>Yes</td><td>Details</td></tr>
+    <tr><td>PATCH</td><td>/api/foods/:id</td><td>Provider/Admin</td><td>Update quantity and fields</td></tr>
+    <tr><td>POST</td><td>/api/foods/:id/claim</td><td>Verified org</td><td>Available → Reserved</td></tr>
+    <tr><td>POST</td><td>/api/foods/:id/collect</td><td>Claiming org</td><td>Reserved → Collected</td></tr>
+  </table>
+  <h2>Organizations /api/organizations</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr>
+    <tr><td>POST</td><td>/api/organizations</td><td>Organization</td><td>Create profile</td></tr>
+    <tr><td>GET/PATCH</td><td>/api/organizations/profile</td><td>Organization</td><td>Own profile</td></tr>
+    <tr><td>GET</td><td>/api/organizations</td><td>Yes</td><td>Search verified</td></tr>
+    <tr><td>POST</td><td>/api/organizations/:id/verify</td><td>Admin</td><td>Verify</td></tr>
+  </table>
+  <h2>Matcher /api/matching</h2>
+  <p>POST /score, /find, /impact — FoodMatcher, WasteAnalyzer, SustainabilityCalculator.</p>
+  <h2>AI /api/ai</h2>
+  <p>POST /recommend, /rag/query, /agent. Tools: find_available_food, find_organizations, calculate_match_score, generate_match_recommendation.</p>
+  <p>Full tables: <code>docs/api-documentation.md</code>.</p>
+</body>
+</html>

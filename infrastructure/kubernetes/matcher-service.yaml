@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: matcher
+  namespace: foodloop
+  labels:
+    app: matcher
+    app.kubernetes.io/part-of: foodloop
+spec:
+  type: ClusterIP
+  selector:
+    app: matcher
+  ports:
+    - name: http
+      port: 8001
+      targetPort: http
