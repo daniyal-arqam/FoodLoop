@@ -7,10 +7,7 @@ const ThemeContext = createContext(null);
 function resolveInitialTheme() {
   const stored = getItem(THEME_STORAGE_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    return "dark";
-  }
-  return "light";
+  return "dark";
 }
 
 export function ThemeProvider({ children }) {

@@ -1,14 +1,26 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.js";
 import { ThemeToggle } from "../ui/ThemeToggle.jsx";
 import { Button } from "../ui/Button.jsx";
+import { FlipButton } from "../motion/FlipButton.jsx";
 import { dashboardPathForRole } from "../../utils/roles.js";
 import { BrandLogo } from "../brand/BrandLogo.jsx";
 
 export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const dashboard = user ? dashboardPathForRole(user.role) : "/login";
+  const [scrolled, setScrolled] = useState(false);
+  const marketing = location.pathname === "/";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   async function handleLogout() {
     await logout();
@@ -16,7 +28,7 @@ export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
   }
 
   return (
-    <header className="navbar">
+    <header className={`navbar ${scrolled ? "is-scrolled" : ""} ${marketing ? "navbar-marketing" : ""}`}>
       <div className="row">
         {showMenu ? (
           <Button
@@ -30,14 +42,31 @@ export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
           </Button>
         ) : null}
         <NavLink to="/" className="brand" aria-label="FoodLoop home">
-          <BrandLogo size={34} />
+          <BrandLogo size={40} />
           <span className="brand-text">FoodLoop</span>
         </NavLink>
       </div>
       <nav className="nav-links" aria-label="Primary">
-        <NavLink to="/" className="nav-link" end>
-          Home
-        </NavLink>
+        {marketing ? (
+          <>
+            <a className="nav-link" href="#how-it-works">
+              How it works
+            </a>
+            <a className="nav-link" href="#matching">
+              Matching
+            </a>
+            <a className="nav-link" href="#ai">
+              AI
+            </a>
+            <a className="nav-link" href="#impact">
+              Impact
+            </a>
+          </>
+        ) : (
+          <NavLink to="/" className="nav-link" end>
+            Home
+          </NavLink>
+        )}
         {isAuthenticated ? (
           <>
             <NavLink to={dashboard} className="nav-link">
@@ -48,14 +77,9 @@ export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
             </NavLink>
           </>
         ) : (
-          <>
-            <NavLink to="/login" className="nav-link">
-              Login
-            </NavLink>
-            <NavLink to="/register" className="nav-link">
-              Register
-            </NavLink>
-          </>
+          <NavLink to="/login" className="nav-link">
+            Sign in
+          </NavLink>
         )}
       </nav>
       <div className="nav-actions">
@@ -64,9 +88,9 @@ export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
         {isAuthenticated ? (
           <Button onClick={handleLogout}>Log out</Button>
         ) : (
-          <NavLink to="/login" className="btn btn-primary">
-            Sign in
-          </NavLink>
+          <FlipButton to="/register" backLabel="Join →">
+            Get started
+          </FlipButton>
         )}
       </div>
     </header>

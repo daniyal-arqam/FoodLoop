@@ -1,3 +1,6 @@
+import { TiltCard } from "../motion/TiltCard.jsx";
+import { AnimatedCounter } from "../motion/AnimatedCounter.jsx";
+
 export function Card({ title, actions, children, className = "" }) {
   return (
     <section className={`card ${className}`}>
@@ -14,10 +17,12 @@ export function Card({ title, actions, children, className = "" }) {
 
 export function StatCard({ label, value, hint }) {
   return (
-    <article className="card stat-card">
+    <TiltCard as="article" className="card stat-card">
       <p className="muted">{label}</p>
-      <p className="value">{value}</p>
+      <p className="value">
+        <AnimatedCounter value={value} />
+      </p>
       {hint ? <p className="muted">{hint}</p> : null}
-    </article>
+    </TiltCard>
   );
 }

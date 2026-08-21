@@ -5,7 +5,7 @@ import { RouteFade } from "../components/layout/RouteFade.jsx";
 
 export function AuthLayout() {
   return (
-    <div className="app-shell">
+    <div className="app-shell auth-shell">
       <SkipLink />
       <Navbar />
       <main id="main-content" className="auth-panel">
