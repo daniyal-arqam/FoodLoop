@@ -11,8 +11,8 @@ import { Button } from "../components/ui/Button.jsx";
 import { GoogleSignIn } from "../components/auth/GoogleSignIn.jsx";
 
 const ROLE_LABELS = {
-  [USER_ROLES.PROVIDER]: "Provider",
-  [USER_ROLES.ORGANIZATION]: "Organization",
+  [USER_ROLES.PROVIDER]: "I have leftover food",
+  [USER_ROLES.ORGANIZATION]: "I collect food for a community",
 };
 
 export function RegisterPage() {
@@ -34,7 +34,7 @@ export function RegisterPage() {
     setSubmitting(true);
     try {
       const currentUser = await register(form);
-      toast.success("Account created");
+      toast.success("You’re in. Welcome.");
       navigate(postAuthPath(currentUser), { replace: true });
       return currentUser;
     } catch (err) {
@@ -47,7 +47,7 @@ export function RegisterPage() {
   }
 
   return (
-    <Card title="Join FoodLoop" className="page-narrow auth-card">
+    <Card title="Come join the loop" className="page-narrow auth-card">
       <form className="stack" onSubmit={handleSubmit} noValidate>
         {error ? (
           <p className="error" role="alert">
@@ -79,13 +79,13 @@ export function RegisterPage() {
           autoComplete="new-password"
           required
           minLength={8}
-          hint="At least 8 characters"
+          hint="At least 8 characters — something you’ll remember"
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
         />
         <Select
           id="role"
-          label="Role"
+          label="I’m here because"
           value={form.role}
           onChange={(event) => setForm({ ...form, role: event.target.value })}
         >
@@ -96,7 +96,7 @@ export function RegisterPage() {
           ))}
         </Select>
         <Button type="submit" variant="primary" disabled={submitting} aria-busy={submitting}>
-          {submitting ? "Creating account…" : "Register"}
+          {submitting ? "Creating your account…" : "Create account"}
         </Button>
       </form>
       <div className="auth-divider">
@@ -105,12 +105,12 @@ export function RegisterPage() {
       <GoogleSignIn
         role={form.role}
         onSignedIn={(currentUser) => {
-          toast.success("Signed in");
+          toast.success("You’re in");
           navigate(postAuthPath(currentUser), { replace: true });
         }}
       />
       <p className="muted">
-        Already registered? <Link to="/login">Sign in</Link>.
+        Already have an account? <Link to="/login">Sign in</Link>.
       </p>
     </Card>
   );

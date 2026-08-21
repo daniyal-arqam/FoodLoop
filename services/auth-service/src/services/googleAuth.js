@@ -10,7 +10,7 @@ function getClientId() {
 async function defaultVerifyGoogleIdToken(idToken) {
   const clientId = getClientId();
   if (!clientId) {
-    throw new AppError("Google sign-in is not configured", 503);
+    throw new AppError("Google isn’t connected yet. Try email sign-in.", 503);
   }
   if (!idToken || typeof idToken !== "string") {
     throw new AppError("Google sign-in token is required", 400);
@@ -32,7 +32,7 @@ async function defaultVerifyGoogleIdToken(idToken) {
     if (error instanceof AppError) {
       throw error;
     }
-    throw new AppError("Google sign-in failed", 401);
+    throw new AppError("Google could not verify that account.", 401);
   }
 }
 

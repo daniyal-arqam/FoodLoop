@@ -12,6 +12,7 @@ const router = express.Router();
 router.post("/register", loginRegisterLimiter, validateRegister, asyncHandler(authController.register));
 router.post("/login", loginRegisterLimiter, validateLogin, asyncHandler(authController.login));
 router.post("/google", loginRegisterLimiter, validateGoogleLogin, asyncHandler(authController.loginWithGoogle));
+router.get("/google/config", asyncHandler(authController.googleConfig));
 router.post("/logout", authenticate, asyncHandler(authController.logout));
 router.get("/me", authenticate, asyncHandler(authController.me));
 router.get(

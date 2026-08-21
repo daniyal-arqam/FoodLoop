@@ -43,7 +43,8 @@ function isPublicAuthRoute(req) {
   return (
     (req.method === "POST" && req.path === "/register") ||
     (req.method === "POST" && req.path === "/login") ||
-    (req.method === "POST" && req.path === "/google")
+    (req.method === "POST" && req.path === "/google") ||
+    (req.method === "GET" && req.path === "/google/config")
   );
 }
 

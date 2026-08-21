@@ -26,7 +26,7 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       const currentUser = await login(form);
-      toast.success("Signed in");
+      toast.success("Welcome back");
       navigate(postAuthPath(currentUser, location.state?.from), { replace: true });
     } catch (err) {
       const message = errorMessage(err);
@@ -64,7 +64,7 @@ export function LoginPage() {
           onChange={(event) => setForm({ ...form, password: event.target.value })}
         />
         <Button type="submit" variant="primary" disabled={submitting} aria-busy={submitting}>
-          {submitting ? "Signing in…" : "Sign in"}
+          {submitting ? "Signing you in…" : "Sign in"}
         </Button>
       </form>
       <div className="auth-divider">
@@ -72,22 +72,22 @@ export function LoginPage() {
       </div>
       <Select
         id="google-role"
-        label="Continue with Google as"
+        label="I use FoodLoop as"
         value={googleRole}
         onChange={(event) => setGoogleRole(event.target.value)}
       >
-        <option value={USER_ROLES.PROVIDER}>Provider</option>
-        <option value={USER_ROLES.ORGANIZATION}>Organization</option>
+        <option value={USER_ROLES.PROVIDER}>Someone with leftover food</option>
+        <option value={USER_ROLES.ORGANIZATION}>Someone who collects food for a community</option>
       </Select>
       <GoogleSignIn
         role={googleRole}
         onSignedIn={(currentUser) => {
-          toast.success("Signed in");
+          toast.success("You’re in");
           navigate(postAuthPath(currentUser, location.state?.from), { replace: true });
         }}
       />
       <p className="muted">
-        New here? <Link to="/register">Create an account</Link>.
+        New here? <Link to="/register">Make an account</Link>.
       </p>
     </Card>
   );

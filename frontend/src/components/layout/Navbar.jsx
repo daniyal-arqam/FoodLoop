@@ -3,6 +3,7 @@ import { useAuth } from "../../hooks/useAuth.js";
 import { ThemeToggle } from "../ui/ThemeToggle.jsx";
 import { Button } from "../ui/Button.jsx";
 import { dashboardPathForRole } from "../../utils/roles.js";
+import { BrandLogo } from "../brand/BrandLogo.jsx";
 
 export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
   const { user, isAuthenticated, logout } = useAuth();
@@ -29,7 +30,7 @@ export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
           </Button>
         ) : null}
         <NavLink to="/" className="brand" aria-label="FoodLoop home">
-          <span className="brand-mark" aria-hidden="true">↻</span>
+          <BrandLogo size={34} />
           <span className="brand-text">FoodLoop</span>
         </NavLink>
       </div>

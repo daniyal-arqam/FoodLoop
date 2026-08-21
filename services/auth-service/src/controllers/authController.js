@@ -16,6 +16,11 @@ async function loginWithGoogle(req, res) {
   return sendSuccess(res, result, "Login successful");
 }
 
+async function googleConfig(_req, res) {
+  const { getClientId } = require("../services/googleAuth");
+  return sendSuccess(res, { clientId: getClientId() || null }, "Google sign-in config");
+}
+
 async function me(req, res) {
   const user = authService.getCurrentUser(req.user.user);
   return sendSuccess(res, { user }, "Authenticated user");
@@ -47,6 +52,7 @@ module.exports = {
   register,
   login,
   loginWithGoogle,
+  googleConfig,
   me,
   logout,
   listUsers,

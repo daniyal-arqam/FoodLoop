@@ -6,7 +6,7 @@ async function connectDatabase(mongoose, uri, options = {}) {
   mongoose.set("strictQuery", true);
 
   await mongoose.connect(uri, {
-    serverSelectionTimeoutMS: options.serverSelectionTimeoutMS || 5000,
+    serverSelectionTimeoutMS: options.serverSelectionTimeoutMS || 20000,
   });
 
   return mongoose.connection;

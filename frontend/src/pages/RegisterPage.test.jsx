@@ -25,9 +25,11 @@ describe("RegisterPage", () => {
     expect(screen.getByLabelText("Name")).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
-    expect(screen.getByLabelText("Role")).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Provider" }).value).toBe(USER_ROLES.PROVIDER);
-    expect(screen.getByRole("option", { name: "Organization" }).value).toBe(USER_ROLES.ORGANIZATION);
+    expect(screen.getByLabelText("I’m here because")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "I have leftover food" }).value).toBe(USER_ROLES.PROVIDER);
+    expect(screen.getByRole("option", { name: "I collect food for a community" }).value).toBe(
+      USER_ROLES.ORGANIZATION
+    );
     expect(screen.queryByRole("option", { name: "Admin" })).not.toBeInTheDocument();
   });
 });

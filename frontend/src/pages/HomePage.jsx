@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth.js";
 import { dashboardPathForRole } from "../utils/roles.js";
 import { Card } from "../components/ui/Card.jsx";
 import { GoogleSignIn } from "../components/auth/GoogleSignIn.jsx";
+import { BrandLogo } from "../components/brand/BrandLogo.jsx";
 
 function HeroStage() {
   const stageRef = useRef(null);
@@ -78,12 +79,17 @@ export function HomePage() {
     <div className="home-page">
       <section className="hero">
         <div className="hero-copy">
-          <p className="badge badge-success">Food rescue, in one loop</p>
-          <h1 className="display hero-title">The meal that almost went to waste can still reach a table tonight.</h1>
+          <div className="hero-brand">
+            <BrandLogo size={56} />
+            <div>
+              <p className="badge badge-success">Food rescue, in one loop</p>
+              <p className="hero-wordmark">FoodLoop</p>
+            </div>
+          </div>
+          <h1 className="display hero-title">That leftover tray can still feed someone tonight.</h1>
           <p className="lede">
-            Kitchens close with trays left over. Nearby community organizations are still looking for food. FoodLoop is
-            the quiet coordination layer in between — list surplus, match a trusted claimant, and close the loop before
-            the clock runs out.
+            Kitchens close with food still good to eat. Nearby community kitchens are still looking for dinner. FoodLoop
+            is the quiet middle: list what you have, match a trusted neighbor, and get it picked up before it expires.
           </p>
           <div className="row hero-actions">
             {isAuthenticated ? (
@@ -93,7 +99,7 @@ export function HomePage() {
             ) : (
               <>
                 <Link className="btn btn-primary" to="/register">
-                  Start rescuing food
+                  Join the loop
                 </Link>
                 <Link className="btn btn-ghost" to="/login">
                   Sign in
@@ -105,33 +111,72 @@ export function HomePage() {
         <HeroStage />
       </section>
 
-      <section className="story-grid" aria-label="How FoodLoop works">
-        <Card title="Tonight’s surplus">
-          <p className="muted">
-            A cafeteria, restaurant, or household publishes what is still safe to eat — how much, what kind, where to
-            pick it up, and when it expires.
+      <section className="story-define" aria-labelledby="what-foodloop-is">
+        <Card>
+          <h2 id="what-foodloop-is" className="display story-close-title">
+            What this is, in plain words
+          </h2>
+          <p className="lede">
+            Not a shop. Not a delivery app. You post leftover food that is still safe. A verified community group claims
+            it, comes to pick it up, and serves it. Both of you watch the same listing move from available, to reserved,
+            to collected.
           </p>
         </Card>
-        <Card title="A trusted neighbor">
+      </section>
+
+      <section className="story-grid-2" aria-label="Who FoodLoop is for">
+        <Card title="If you cooked more than you served">
           <p className="muted">
-            Verified community organizations see nearby listings, a match score, and a clear claim path. No marketplace.
-            No payments. Just coordination.
+            Café, canteen, bakery, or home kitchen — tell us how much is left, what it is, when someone can collect it,
+            and when it expires. You are a Provider. You keep good food out of the bin.
           </p>
         </Card>
-        <Card title="The loop closes">
+        <Card title="If you feed people nearby">
           <p className="muted">
-            Status moves from available to reserved to collected. Advisories and matching help sit on the same live
-            records, so guidance is about real food still in the system.
+            Shelter, community kitchen, or similar group — register as an Organization. After we verify you, you can
+            claim food close to you, see why it fits, and pick it up in time.
+          </p>
+        </Card>
+      </section>
+
+      <section aria-labelledby="how-a-night-works">
+        <h2 id="how-a-night-works" className="home-section-title">
+          A normal night
+        </h2>
+        <div className="story-grid-2">
+          <Card title="1. List it">
+            <p className="muted">Put up what’s still good, with a pickup time you can actually keep.</p>
+          </Card>
+          <Card title="2. We match">
+            <p className="muted">Nearby verified groups see a score — how close they are, what they need, how soon it expires.</p>
+          </Card>
+          <Card title="3. Someone claims">
+            <p className="muted">One group reserves it. Nobody else can grab the same tray at the same time.</p>
+          </Card>
+          <Card title="4. They collect">
+            <p className="muted">Pickup happens in the window. The listing closes. The loop is done for the night.</p>
+          </Card>
+        </div>
+      </section>
+
+      <section className="story-grid-2" aria-label="Guidance and limits">
+        <Card title="A little help, on real food">
+          <p className="muted">
+            Safety and waste tips talk about the listings actually on the platform — not a made-up fridge.
+          </p>
+        </Card>
+        <Card title="What this isn’t">
+          <p className="muted">
+            Not groceries. Not paid delivery. Not “anyone can take it.” Only verified organizations can claim.
           </p>
         </Card>
       </section>
 
       <section className="story-close">
         <Card>
-          <h2 className="display story-close-title">Waste is a logistics problem. Treat it like one.</h2>
+          <h2 className="display story-close-title">If it’s still good, it still belongs on a plate.</h2>
           <p className="lede">
-            If you cook more than you can serve, list it. If you feed a neighborhood, claim it. FoodLoop keeps both
-            sides on the same timeline.
+            Got extra? List it. Feeding people? Claim it. We’ll keep you on the same clock until someone collects it.
           </p>
           {!isAuthenticated ? (
             <div className="stack">
@@ -140,7 +185,7 @@ export function HomePage() {
                   Create an account
                 </Link>
                 <Link className="btn btn-ghost" to="/login">
-                  Continue with email
+                  I already have one
                 </Link>
               </div>
               <GoogleSignIn onSignedIn={(nextUser) => navigate(dashboardPathForRole(nextUser.role), { replace: true })} />

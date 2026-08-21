@@ -281,4 +281,11 @@ describe("auth-service HTTP", { concurrency: false }, () => {
     assert.equal(body.data.user.role, "Provider");
     assert.equal(typeof body.data.accessToken, "string");
   });
+
+  it("exposes a public Google client id config endpoint", async () => {
+    const { status, body } = await request(server.url, "GET", "/auth/google/config");
+    assert.equal(status, 200);
+    assert.equal(body.success, true);
+    assert.equal("clientId" in body.data, true);
+  });
 });

@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Navbar } from "../components/layout/Navbar.jsx";
 import { Sidebar } from "../components/layout/Sidebar.jsx";
 import { SkipLink } from "../components/layout/SkipLink.jsx";
+import { RouteFade } from "../components/layout/RouteFade.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { USER_ROLES } from "../utils/constants.js";
 
@@ -40,9 +41,11 @@ export function DashboardLayout() {
       <Navbar showMenu menuOpen={menuOpen} onMenuToggle={() => setMenuOpen((open) => !open)} />
       <div className="sidebar-layout">
         <Sidebar items={items} open={menuOpen} onNavigate={() => setMenuOpen(false)} />
-        <main id="main-content" className="content page-enter">
+        <main id="main-content" className="content">
           <div className="page-wide">
-            <Outlet />
+            <RouteFade>
+              <Outlet />
+            </RouteFade>
           </div>
         </main>
       </div>
