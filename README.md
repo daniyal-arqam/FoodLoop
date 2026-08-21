@@ -143,3 +143,5 @@ With the stack running (`./scripts/dev.sh`):
 
 Open http://localhost:5173 and follow [docs/DEMO.md](docs/DEMO.md) for the seeded demo accounts.
 
+Live (Vercel frontend + Render APIs + MongoDB Atlas): [docs/LIVE.md](docs/LIVE.md).
+

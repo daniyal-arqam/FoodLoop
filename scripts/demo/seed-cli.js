@@ -23,7 +23,7 @@ async function main() {
   const result = await seedDemo({ gatewayUrl, mongoUri, resetListings: true, createListing: true });
 
   process.stdout.write(`
-FoodLoop demo seed complete. App: http://localhost:5173
+FoodLoop demo seed complete. Gateway: ${gatewayUrl}
 
 Provider     ${DEMO_ACCOUNTS.provider.email}  /  ${DEMO_ACCOUNTS.provider.password}
 Organization ${DEMO_ACCOUNTS.organization.email}     /  ${DEMO_ACCOUNTS.organization.password}

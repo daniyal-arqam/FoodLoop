@@ -5,5 +5,6 @@
 - [api-documentation.md](./api-documentation.md) — gateway APIs. Print [api-documentation.html](./api-documentation.html) to PDF.
 - [FYP.md](./FYP.md) — problem, users, future improvements.
 - [DEMO.md](./DEMO.md) — hackathon demo runbook.
+- [LIVE.md](./LIVE.md) — Vercel + Render + Atlas public deploy.
 - [presentation.md](./presentation.md) — 5–7 minute talk outline.
 - [SECURITY.md](./SECURITY.md) — auth, RBAC, secrets, residual risks.

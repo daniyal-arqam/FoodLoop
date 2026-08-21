@@ -1,0 +1,152 @@
+# Render Blueprint — backend + Python services (frontend is on Vercel).
+# Free web services sleep after idle; wake the gateway before a live demo.
+# MONGODB_URI is prompted in the dashboard (do not commit Atlas passwords).
+
+envVarGroups:
+  - name: foodloop-shared
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_EXPIRES_IN
+        value: "1d"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: JWT_SECRET
+        generateValue: true
+
+services:
+  - type: web
+    name: foodloop-auth
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./services/auth-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: foodloop-shared
+      - key: SERVICE_NAME
+        value: auth-service
+      - key: MONGODB_URI
+        sync: false
+
+  - type: web
+    name: foodloop-food
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./services/food-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: foodloop-shared
+      - key: SERVICE_NAME
+        value: food-service
+      - key: MONGODB_URI
+        sync: false
+
+  - type: web
+    name: foodloop-org
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./services/organization-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: foodloop-shared
+      - key: SERVICE_NAME
+        value: organization-service
+      - key: MONGODB_URI
+        sync: false
+
+  - type: web
+    name: foodloop-matcher
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./python-services/matcher/Dockerfile
+    dockerContext: ./python-services/matcher
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: foodloop-shared
+      - key: SERVICE_NAME
+        value: matcher
+
+  - type: web
+    name: foodloop-ai
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./ai-service/Dockerfile
+    dockerContext: ./ai-service
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: foodloop-shared
+      - key: SERVICE_NAME
+        value: ai-service
+      - key: FOOD_SERVICE_URL
+        fromService:
+          name: foodloop-food
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ORGANIZATION_SERVICE_URL
+        fromService:
+          name: foodloop-org
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: MATCHER_URL
+        fromService:
+          name: foodloop-matcher
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: AI_TIMEOUT_SECONDS
+        value: "20"
+      - key: FOODLOOP_TIMEOUT_SECONDS
+        value: "15"
+      - key: AGENT_MAX_STEPS
+        value: "8"
+
+  - type: web
+    name: foodloop-gateway
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./services/api-gateway/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: foodloop-shared
+      - key: SERVICE_NAME
+        value: api-gateway
+      - key: PROXY_TIMEOUT_MS
+        value: "20000"
+      - key: AI_PROXY_TIMEOUT_MS
+        value: "25000"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          name: foodloop-auth
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: FOOD_SERVICE_URL
+        fromService:
+          name: foodloop-food
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ORGANIZATION_SERVICE_URL
+        fromService:
+          name: foodloop-org
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: MATCHER_URL
+        fromService:
+          name: foodloop-matcher
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: AI_SERVICE_URL
+        fromService:
+          name: foodloop-ai
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
