@@ -1,5 +1,7 @@
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+const googleClientId =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  "224783678373-ahvat1kgpres0ua1v582i4k9fab4n23d.apps.googleusercontent.com";
 
 export const config = {
   apiBaseUrl,

@@ -3,8 +3,18 @@ import { ApiError } from "../utils/errors.js";
 import { clearAccessToken, getAccessToken } from "./tokenStore.js";
 
 let unauthorizedHandler = null;
-const RETRYABLE_STATUS = new Set([502, 503, 504]);
 const MAX_RETRIES = 3;
+
+function isRetryableStatus(response) {
+  if (response.status === 502 || response.status === 504) {
+    return true;
+  }
+  if (response.status === 503) {
+    const contentType = response.headers.get("content-type") || "";
+    return !contentType.includes("application/json");
+  }
+  return false;
+}
 
 export function onUnauthorized(handler) {
   unauthorizedHandler = handler;
@@ -61,7 +71,7 @@ export async function apiRequest(
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt += 1) {
     try {
       response = await fetchOnce(url, init);
-      if (!RETRYABLE_STATUS.has(response.status) || attempt === MAX_RETRIES) {
+      if (!isRetryableStatus(response) || attempt === MAX_RETRIES) {
         break;
       }
     } catch (error) {

@@ -32,6 +32,22 @@ describe("apiRequest retries", () => {
     expect(payload.success).toBe(true);
   });
 
+  it("does not retry a JSON 503 from the API", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ success: false, message: "Google isn’t connected yet. Try email sign-in." }), {
+        status: 503,
+        headers: { "content-type": "application/json" },
+      })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(apiRequest("/api/auth/google", { auth: false, method: "POST", body: {} })).rejects.toMatchObject({
+      status: 503,
+      message: "Google isn’t connected yet. Try email sign-in.",
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("surfaces 401 without retrying", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ message: "Unauthorized" }), {

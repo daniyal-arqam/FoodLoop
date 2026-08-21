@@ -30,7 +30,7 @@ services:
       - key: MONGODB_URI
         sync: false
       - key: GOOGLE_CLIENT_ID
-        sync: false
+        value: 224783678373-ahvat1kgpres0ua1v582i4k9fab4n23d.apps.googleusercontent.com
 
   - type: web
     name: foodloop-food

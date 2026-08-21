@@ -1,16 +1,20 @@
 const { OAuth2Client } = require("google-auth-library");
 const AppError = require("../utils/AppError");
 
+// Public OAuth Web client ID (not a secret). Override with GOOGLE_CLIENT_ID.
+const DEFAULT_GOOGLE_WEB_CLIENT_ID =
+  "224783678373-ahvat1kgpres0ua1v582i4k9fab4n23d.apps.googleusercontent.com";
+
 let verifier = null;
 
 function getClientId() {
-  return (process.env.GOOGLE_CLIENT_ID || "").trim();
+  return (process.env.GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_WEB_CLIENT_ID).trim();
 }
 
 async function defaultVerifyGoogleIdToken(idToken) {
   const clientId = getClientId();
   if (!clientId) {
-    throw new AppError("Google isn’t connected yet. Try email sign-in.", 503);
+    throw new AppError("Google isn’t connected yet. Try email sign-in.", 400);
   }
   if (!idToken || typeof idToken !== "string") {
     throw new AppError("Google sign-in token is required", 400);
