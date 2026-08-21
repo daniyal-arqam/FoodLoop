@@ -13,18 +13,16 @@ export function HomePage() {
   const gateway = useAsyncResource(getGatewayHealth, []);
 
   return (
-    <div>
+    <div className="home-page">
       <section className="hero">
-        <div>
-          <p className="badge badge-success">Smart food rescue</p>
-          <h1 className="display" style={{ fontSize: "clamp(2.4rem, 5vw, 4rem)", margin: "0.6rem 0" }}>
-            Surplus food, looped back to people who need it.
-          </h1>
+        <div className="hero-copy">
+          <p className="badge badge-success">Smart food rescue · PS-04</p>
+          <h1 className="display hero-title">Surplus food, looped back to people who need it.</h1>
           <p className="lede">
-            FoodLoop connects providers, community organizations, and admins so edible surplus is claimed before it
-            expires.
+            FoodLoop connects kitchens with verified community organizations so edible surplus is claimed before it
+            expires — not left in a chat thread.
           </p>
-          <div className="row" style={{ marginTop: "1.5rem" }}>
+          <div className="row hero-actions">
             {isAuthenticated ? (
               <Link className="btn btn-primary" to={dashboardPathForRole(user.role)}>
                 Go to dashboard
@@ -41,19 +39,47 @@ export function HomePage() {
             )}
           </div>
         </div>
-        <Card title="How it works">
-          <ol className="stack" style={{ paddingLeft: "1.1rem" }}>
-            <li>Providers publish surplus listings with quantity, category, and expiry.</li>
-            <li>Verified organizations claim and collect nearby food.</li>
-            <li>The matcher ranks candidates by distance, category, quantity, and urgency.</li>
-          </ol>
+
+        <div className="hero-stage" aria-hidden="true">
+          <div className="hero-orb hero-orb-a" />
+          <div className="hero-orb hero-orb-b" />
+          <div className="hero-stack">
+            <article className="hero-float-card hero-float-back">
+              <p className="muted">Match score</p>
+              <p className="hero-metric">92</p>
+              <p className="muted">Distance · category · urgency</p>
+            </article>
+            <article className="hero-float-card hero-float-mid">
+              <p className="muted">Listing</p>
+              <strong>Vegetarian meal trays</strong>
+              <p className="muted">Available · 40 portions</p>
+            </article>
+            <article className="hero-float-card hero-float-front">
+              <p className="muted">How it works</p>
+              <ol className="hero-steps">
+                <li>Providers publish surplus.</li>
+                <li>Verified orgs claim nearby food.</li>
+                <li>Python matcher ranks the fit.</li>
+              </ol>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid-3 home-pillars" aria-label="Platform pillars">
+        <Card title="List & rescue">
+          <p className="muted">Providers post quantity, category, pickup window, and expiry. Status moves Available → Reserved → Collected.</p>
+        </Card>
+        <Card title="Verified claimants">
+          <p className="muted">Organizations wait for Admin verification, then browse, score, and collect surplus food.</p>
+        </Card>
+        <Card title="Live AI workspace">
+          <p className="muted">Waste advisor, food-safety RAG, and a matching agent that calls the same APIs — not a mocked chatbot.</p>
         </Card>
       </section>
 
       <Card title="Hackathon demo login">
-        <p className="muted">
-          Run <code>./scripts/seed-demo.sh</code> with the stack up, then sign in with these accounts.
-        </p>
+        <p className="muted">Use these accounts on the live app after seed, or locally after `./scripts/seed-demo.sh`.</p>
         <ul className="stack">
           <li>
             Provider: {DEMO_ACCOUNTS.provider.email} / {DEMO_ACCOUNTS.provider.password}
@@ -81,7 +107,8 @@ export function HomePage() {
           {gateway.loading && <p role="status">Checking gateway…</p>}
           {gateway.error && (
             <p role="alert">
-              Gateway unreachable. Start it on port 8080 or set <code>VITE_API_BASE_URL</code>.
+              Gateway is waking up or unreachable. Wait a few seconds, then refresh. Confirm <code>VITE_API_BASE_URL</code>{" "}
+              if this persists.
             </p>
           )}
           {gateway.data && (

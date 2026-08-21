@@ -36,7 +36,7 @@ export function LoginPage() {
   }
 
   return (
-    <Card title="Welcome back" className="page-narrow">
+    <Card title="Welcome back" className="page-narrow auth-card">
       <form className="stack" onSubmit={handleSubmit} noValidate>
         {error ? (
           <p className="error" role="alert">
@@ -69,7 +69,7 @@ export function LoginPage() {
         </p>
       </form>
       <div className="demo-accounts">
-        <p className="muted">Hackathon demo accounts (after `./scripts/seed-demo.sh`)</p>
+        <p className="muted">Demo shortcuts (live or after seed)</p>
         <div className="row" style={{ flexWrap: "wrap" }}>
           {DEMO_ACCOUNT_LIST.map((account) => (
             <Button

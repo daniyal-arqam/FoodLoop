@@ -40,7 +40,7 @@ export function DashboardLayout() {
       <Navbar showMenu menuOpen={menuOpen} onMenuToggle={() => setMenuOpen((open) => !open)} />
       <div className="sidebar-layout">
         <Sidebar items={items} open={menuOpen} onNavigate={() => setMenuOpen(false)} />
-        <main id="main-content" className="content">
+        <main id="main-content" className="content page-enter">
           <div className="page-wide">
             <Outlet />
           </div>

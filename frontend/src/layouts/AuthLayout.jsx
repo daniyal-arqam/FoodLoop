@@ -7,7 +7,7 @@ export function AuthLayout() {
     <div className="app-shell">
       <SkipLink />
       <Navbar />
-      <main id="main-content" className="auth-panel">
+      <main id="main-content" className="auth-panel page-enter">
         <Outlet />
       </main>
     </div>

@@ -46,7 +46,7 @@ export function RegisterPage() {
   }
 
   return (
-    <Card title="Join FoodLoop" className="page-narrow">
+    <Card title="Join FoodLoop" className="page-narrow auth-card">
       <form className="stack" onSubmit={handleSubmit} noValidate>
         {error ? (
           <p className="error" role="alert">

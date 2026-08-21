@@ -3,6 +3,8 @@ import { ApiError } from "../utils/errors.js";
 import { clearAccessToken, getAccessToken } from "./tokenStore.js";
 
 let unauthorizedHandler = null;
+const RETRYABLE_STATUS = new Set([502, 503, 504]);
+const MAX_RETRIES = 3;
 
 export function onUnauthorized(handler) {
   unauthorizedHandler = handler;
@@ -19,6 +21,20 @@ function buildQuery(params = {}) {
   return encoded ? `?${encoded}` : "";
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function fetchOnce(url, init) {
+  try {
+    return await fetch(url, init);
+  } catch {
+    throw new ApiError("Network error. Check your connection and try again.", 0);
+  }
+}
+
 export async function apiRequest(
   path,
   { method = "GET", body, auth = true, query, skipUnauthorized = false } = {}
@@ -33,11 +49,33 @@ export async function apiRequest(
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${config.apiBaseUrl}${path}${buildQuery(query)}`, {
+  const url = `${config.apiBaseUrl}${path}${buildQuery(query)}`;
+  const init = {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  };
+
+  let response;
+  let lastError;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt += 1) {
+    try {
+      response = await fetchOnce(url, init);
+      if (!RETRYABLE_STATUS.has(response.status) || attempt === MAX_RETRIES) {
+        break;
+      }
+    } catch (error) {
+      lastError = error;
+      if (attempt === MAX_RETRIES) {
+        throw error;
+      }
+    }
+    await sleep(1400 * attempt);
+  }
+
+  if (!response) {
+    throw lastError || new ApiError("Network error. Check your connection and try again.", 0);
+  }
 
   let payload = null;
   const contentType = response.headers.get("content-type") || "";

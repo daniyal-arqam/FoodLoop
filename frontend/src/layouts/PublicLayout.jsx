@@ -7,7 +7,7 @@ export function PublicLayout() {
     <div className="app-shell">
       <SkipLink />
       <Navbar />
-      <main id="main-content" className="content">
+      <main id="main-content" className="content page-enter">
         <div className="page-wide">
           <Outlet />
         </div>

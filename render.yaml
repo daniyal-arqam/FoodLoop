@@ -122,9 +122,9 @@ services:
       - key: SERVICE_NAME
         value: api-gateway
       - key: PROXY_TIMEOUT_MS
-        value: "20000"
+        value: "60000"
       - key: AI_PROXY_TIMEOUT_MS
-        value: "25000"
+        value: "55000"
       - key: AUTH_SERVICE_URL
         fromService:
           name: foodloop-auth
