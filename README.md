@@ -36,6 +36,8 @@ Copy environment defaults:
 cp .env.example .env
 ```
 
+What each variable means, what is secret, and what to set on Vercel/Render: [docs/ENV.md](docs/ENV.md).
+
 Install Node dependencies:
 
 ```bash
@@ -144,4 +146,5 @@ With the stack running (`./scripts/dev.sh`):
 Open http://localhost:5173 and follow [docs/DEMO.md](docs/DEMO.md) for the seeded demo accounts.
 
 Live (Vercel frontend + Render APIs + MongoDB Atlas): [docs/LIVE.md](docs/LIVE.md).
+
 
