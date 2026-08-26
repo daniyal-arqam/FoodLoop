@@ -42,7 +42,7 @@ export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
           </Button>
         ) : null}
         <NavLink to="/" className="brand" aria-label="FoodLoop home">
-          <BrandLogo size={40} />
+          <BrandLogo size={44} />
           <span className="brand-text">FoodLoop</span>
         </NavLink>
       </div>
@@ -83,7 +83,12 @@ export function Navbar({ onMenuToggle, showMenu = false, menuOpen = false }) {
         )}
       </nav>
       <div className="nav-actions">
-        {user ? <span className="muted nav-user-name">{user.name}</span> : null}
+        {user ? (
+          <span className="muted nav-user-name">
+            {user.name}
+            {user.role ? ` · ${user.role}` : ""}
+          </span>
+        ) : null}
         <ThemeToggle />
         {isAuthenticated ? (
           <Button onClick={handleLogout}>Log out</Button>

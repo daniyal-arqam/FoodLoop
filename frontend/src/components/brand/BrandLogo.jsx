@@ -1,12 +1,11 @@
 export function BrandLogo({ size = 36, className = "" }) {
   return (
-    <img
+    <span
       className={`brand-logo ${className}`.trim()}
-      src="/brand/foodloop-logo.png"
-      alt=""
-      width={Math.round(size * 1.7)}
-      height={size}
-      decoding="async"
-    />
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
+      aria-hidden="true"
+    >
+      FL
+    </span>
   );
 }

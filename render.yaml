@@ -1,5 +1,6 @@
 # Render Blueprint — backend + Python services (frontend is on Vercel).
-# Free web services sleep after idle; wake the gateway before a live demo.
+# Free web services sleep after idle. Gateway self-ping + GitHub Actions
+# GET /health every 45s. Optional foodloop-keepalive worker is Starter (paid).
 # MONGODB_URI is prompted in the dashboard (do not commit Atlas passwords).
 
 envVarGroups:
@@ -148,6 +149,57 @@ services:
           type: web
           envVarKey: RENDER_EXTERNAL_URL
       - key: AI_SERVICE_URL
+        fromService:
+          name: foodloop-ai
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: KEEPALIVE_ENABLED
+        value: "true"
+      - key: KEEPALIVE_INTERVAL_MS
+        value: "45000"
+      - key: KEEPALIVE_FRONTEND_URL
+        value: https://food-loop-theta.vercel.app
+
+  # Always-on pinger. Starter is required — free workers are not supported,
+  # and a free web service would sleep like the APIs it is meant to wake.
+  - type: worker
+    name: foodloop-keepalive
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./scripts/keepalive/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: KEEPALIVE_INTERVAL_MS
+        value: "45000"
+      - key: KEEPALIVE_FRONTEND_URL
+        value: https://food-loop-theta.vercel.app
+      - key: KEEPALIVE_GATEWAY_URL
+        fromService:
+          name: foodloop-gateway
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: KEEPALIVE_AUTH_URL
+        fromService:
+          name: foodloop-auth
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: KEEPALIVE_FOOD_URL
+        fromService:
+          name: foodloop-food
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: KEEPALIVE_ORG_URL
+        fromService:
+          name: foodloop-org
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: KEEPALIVE_MATCHER_URL
+        fromService:
+          name: foodloop-matcher
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: KEEPALIVE_AI_URL
         fromService:
           name: foodloop-ai
           type: web

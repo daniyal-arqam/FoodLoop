@@ -219,22 +219,24 @@ textarea {
 }
 
 .brand-logo {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  height: auto;
-  object-fit: contain;
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--primary) 32%, transparent));
-  transition: transform var(--motion-slow), filter var(--motion);
-}
-
-:root[data-theme="light"] .brand-logo {
-  mix-blend-mode: normal;
+  border-radius: 0.72rem;
+  background: var(--primary);
+  color: var(--primary-contrast);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--primary) 32%, transparent);
+  transition: transform var(--motion-slow), box-shadow var(--motion);
 }
 
 .brand:hover .brand-logo {
   transform: scale(1.06);
-  filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--accent) 35%, transparent));
+  box-shadow: 0 10px 18px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .brand-logo-orbit {

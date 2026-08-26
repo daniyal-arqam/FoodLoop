@@ -1,0 +1,29 @@
+name: Keepalive
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Ping live health endpoints every 45s
+        env:
+          KEEPALIVE_INTERVAL_MS: "45000"
+          KEEPALIVE_DURATION_MS: "240000"
+          KEEPALIVE_URLS: ${{ vars.KEEPALIVE_URLS }}
+          KEEPALIVE_GATEWAY_URL: ${{ vars.KEEPALIVE_GATEWAY_URL || 'https://foodloop-gateway.onrender.com' }}
+          KEEPALIVE_AUTH_URL: ${{ vars.KEEPALIVE_AUTH_URL || 'https://foodloop-auth.onrender.com' }}
+          KEEPALIVE_FOOD_URL: ${{ vars.KEEPALIVE_FOOD_URL || 'https://foodloop-food.onrender.com' }}
+          KEEPALIVE_ORG_URL: ${{ vars.KEEPALIVE_ORG_URL || 'https://foodloop-org.onrender.com' }}
+          KEEPALIVE_MATCHER_URL: ${{ vars.KEEPALIVE_MATCHER_URL || 'https://foodloop-matcher.onrender.com' }}
+          KEEPALIVE_AI_URL: ${{ vars.KEEPALIVE_AI_URL || 'https://foodloop-ai.onrender.com' }}
+          KEEPALIVE_FRONTEND_URL: ${{ vars.KEEPALIVE_FRONTEND_URL || 'https://food-loop-theta.vercel.app' }}
+        run: node scripts/keepalive.js

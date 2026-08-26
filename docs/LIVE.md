@@ -2,7 +2,13 @@
 
 Public MVP for LoopLearn PS-04. Frontend is on Vercel. API gateway, auth, food, organizations, matcher, and AI run as Render web services. MongoDB is Atlas (free M0). Do not commit Atlas passwords or `.env` files.
 
-Free Render services sleep after about 15 minutes idle. Open the gateway `/health` URL once before a judged demo so containers wake up.
+Free web services sleep after about 15 minutes idle. Three pingers keep them warm (30–60s, default 45s):
+
+1. **Gateway self-ping** — `foodloop-gateway` GETs its own `/health` plus auth, food, org, matcher, AI, and the Vercel frontend.
+2. **GitHub Actions** — `.github/workflows/keepalive.yml` runs every 5 minutes on `main` and pings for ~4 minutes at 45s. Enable Actions on the repo; set `KEEPALIVE_*` repository variables if the Render URLs differ from `https://foodloop-*.onrender.com`.
+3. **Render worker** (`foodloop-keepalive`, Starter) — optional always-on loop. Workers cannot use the free plan.
+
+After a deploy, the first pings can still 502 until containers finish booting.
 
 ## 1. MongoDB Atlas
 
@@ -34,7 +40,7 @@ git push origin main
 2. **New** → **Blueprint**.
 3. Select `daniyal-arqam/FoodLoop`, branch `main`.
 4. When prompted for **MONGODB_URI**, paste the Atlas URI (same value for auth, food, and org — three times).
-5. Apply the Blueprint. First Docker builds can take 15–25 minutes. OpenAI is optional; the demo LLM works without a key.
+5. Apply the Blueprint. First Docker builds can take 15–25 minutes. OpenAI is optional; the demo LLM works without a key. After the first push of `.github/workflows/keepalive.yml`, GitHub Actions should show a **Keepalive** workflow (Actions tab). Confirm **foodloop-keepalive** is running only if you kept the paid Starter worker; the six API services can stay on free.
 6. Open the **foodloop-gateway** service → copy its public URL, for example `https://foodloop-gateway.onrender.com`.
 7. Check `https://YOUR-GATEWAY.onrender.com/health` — you want `{ "success": true, ... }`. If it times out, wait and retry (cold start).
 
@@ -97,7 +103,7 @@ Judges should use the **Vercel** link, not localhost.
 | Symptom | Likely fix |
 |---------|------------|
 | Vercel UI loads, login fails | `VITE_API_BASE_URL` missing or wrong — set it and redeploy frontend |
-| Gateway 502 | A backend is still building or asleep — open each service `/health` |
+| Gateway 502 | A backend is still building or asleep — wait for GitHub Actions **Keepalive** (or `foodloop-keepalive`) to ping, then open each `/health` |
 | Atlas connection error | Network Access `0.0.0.0/0`; password encoded in the URI |
 | Seed cannot create admin | `MONGODB_URI` must be the Atlas URI, not localhost |
 | CORS errors | Shared group already uses `CORS_ORIGINS=*`; wait for gateway restart |
