@@ -36,7 +36,7 @@ Copy environment defaults:
 cp .env.example .env
 ```
 
-What each variable means, what is secret, and what to set on Vercel/Render: [docs/ENV.md](docs/ENV.md).
+What each variable means, what is secret, and what to set on Vercel / your VPS: [docs/ENV.md](docs/ENV.md).
 
 Install Node dependencies:
 
@@ -145,6 +145,6 @@ With the stack running (`./scripts/dev.sh`):
 
 Open http://localhost:5173 and follow [docs/DEMO.md](docs/DEMO.md) for the seeded demo accounts.
 
-Live (Vercel frontend + Render APIs + MongoDB Atlas): [docs/LIVE.md](docs/LIVE.md).
+Live (Vercel frontend + always-on VPS APIs): [docs/LIVE.md](docs/LIVE.md) · [docs/DEPLOY-VPS.md](docs/DEPLOY-VPS.md).
 
 

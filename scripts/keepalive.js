@@ -1,6 +1,6 @@
 /**
  * Ping FoodLoop health URLs on a 30–60s loop (default 45s).
- * Used as a Render worker and as a GitHub Actions cron job.
+ * Optional GitHub Actions monitor for a live gateway URL.
  */
 const MIN_MS = 30_000;
 const MAX_MS = 60_000;

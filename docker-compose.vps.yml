@@ -1,0 +1,63 @@
+# VPS overrides for live deploy (Oracle Always Free / DigitalOcean / any Docker host).
+# Frontend stays on Vercel. Only the API gateway is published.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.vps.yml up -d --build
+#
+# Optional HTTPS (needs a domain pointed at the VM):
+#   docker compose -f docker-compose.yml -f docker-compose.vps.yml --profile https up -d --build
+
+services:
+  mongodb:
+    ports: !reset []
+
+  auth-service:
+    ports: !reset []
+
+  food-service:
+    ports: !reset []
+
+  organization-service:
+    ports: !reset []
+
+  python-matcher:
+    ports: !reset []
+
+  ai-service:
+    ports: !reset []
+
+  api-gateway:
+    ports:
+      - "${GATEWAY_PORT:-8080}:8080"
+    environment:
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      PROXY_TIMEOUT_MS: ${PROXY_TIMEOUT_MS:-60000}
+      AI_PROXY_TIMEOUT_MS: ${AI_PROXY_TIMEOUT_MS:-55000}
+      KEEPALIVE_ENABLED: ${KEEPALIVE_ENABLED:-false}
+
+  # Vercel hosts the SPA — skip the nginx frontend container on the VPS.
+  frontend:
+    profiles: ["with-frontend"]
+
+  caddy:
+    profiles: ["https"]
+    image: caddy:2.9-alpine
+    container_name: foodloop-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      GATEWAY_DOMAIN: ${GATEWAY_DOMAIN:-}
+    volumes:
+      - ./infrastructure/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - foodloop_caddy_data:/data
+      - foodloop_caddy_config:/config
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    networks:
+      - foodloop
+
+volumes:
+  foodloop_caddy_data:
+  foodloop_caddy_config:

@@ -20,7 +20,7 @@ describe("selfPing", () => {
     const urls = collectUrls({
       port: 8080,
       services: {
-        auth: "https://foodloop-auth.onrender.com",
+        auth: "https://auth.example.com",
         food: "http://localhost:4002",
         organization: "",
         matcher: "http://localhost:8001/",
@@ -28,10 +28,10 @@ describe("selfPing", () => {
       },
     });
     assert.deepEqual(
-      urls.filter((url) => url.includes("foodloop-auth") || url.includes("127.0.0.1") || url.endsWith("/health")),
+      urls.filter((url) => url.includes("auth.example") || url.includes("127.0.0.1") || url.endsWith("/health")),
       [
         "http://127.0.0.1:8080/health",
-        "https://foodloop-auth.onrender.com/health",
+        "https://auth.example.com/health",
         "http://localhost:4002/health",
         "http://localhost:8001/health",
         "http://localhost:8002/health",

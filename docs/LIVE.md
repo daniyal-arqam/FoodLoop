@@ -1,109 +1,56 @@
-# Live deploy (Vercel + Render + Atlas)
+# Live deploy (Vercel + always-on VPS)
 
-Public MVP for LoopLearn PS-04. Frontend is on Vercel. API gateway, auth, food, organizations, matcher, and AI run as Render web services. MongoDB is Atlas (free M0). Do not commit Atlas passwords or `.env` files.
+Public MVP for LoopLearn PS-04.
 
-Free web services sleep after about 15 minutes idle. Three pingers keep them warm (30–60s, default 45s):
+| Layer | Host | Cost |
+|-------|------|------|
+| Frontend | **Vercel** | Free |
+| APIs (gateway + auth + food + org + matcher + AI + Mongo) | **Oracle Cloud Always Free** Ampere VM (or any Docker VPS) | Free |
+| Optional hosted DB | MongoDB Atlas M0 | Free (only if you skip Compose Mongo) |
 
-1. **Gateway self-ping** — `foodloop-gateway` GETs its own `/health` plus auth, food, org, matcher, AI, and the Vercel frontend.
-2. **GitHub Actions** — `.github/workflows/keepalive.yml` runs every 5 minutes on `main` and pings for ~4 minutes at 45s. Enable Actions on the repo; set `KEEPALIVE_*` repository variables if the Render URLs differ from `https://foodloop-*.onrender.com`.
-3. **Render worker** (`foodloop-keepalive`, Starter) — optional always-on loop. Workers cannot use the free plan.
+This replaces **Render**. Free Render web services sleep after idle; a VPS does not. Full steps: [DEPLOY-VPS.md](./DEPLOY-VPS.md).
 
-After a deploy, the first pings can still 502 until containers finish booting.
+Do not commit Atlas passwords or filled `.env` files.
 
-## 1. MongoDB Atlas
+## Quick path
 
-1. Sign up at [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas) (GitHub login is fine).
-2. Create a project, then a cluster: **M0 Free**, any nearby region (for example Singapore or Bahrain).
-3. **Database Access** → Add user → password auth. Save the password. Avoid `@`, `#`, `%` in the password so the URI stays simple.
-4. **Network Access** → Add IP → **Allow access from anywhere** (`0.0.0.0/0`). Render IPs are not fixed.
-5. **Connect** → Drivers → copy the URI. Put the password in, and set the database name to `foodloop`:
+1. Create an **Oracle Always Free** Ampere Ubuntu VM (see [DEPLOY-VPS.md](./DEPLOY-VPS.md) § Oracle).
+2. Install Docker, clone the repo, copy `.env.vps.example` → `.env`, set `JWT_SECRET`.
+3. Run `./scripts/deploy-vps.sh`.
+4. On Vercel set `VITE_API_BASE_URL=http://YOUR_VM_IP:8080` and **Redeploy**.
+5. In the [Render dashboard](https://dashboard.render.com), delete the old `foodloop-*` services if they still exist.
 
-```
-mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/foodloop?retryWrites=true&w=majority
-```
-
-Keep this string private. You will paste it into Render only.
-
-## 2. Push this repo (including `render.yaml`)
-
-From the project folder, after you commit the live-deploy files:
-
-```powershell
-git add render.yaml frontend/vercel.json docs/LIVE.md README.md
-git commit -m "Add Vercel, Render, and Atlas live deploy files."
-git push origin main
-```
-
-## 3. Render (backends)
-
-1. Sign up at [https://dashboard.render.com](https://dashboard.render.com) with GitHub.
-2. **New** → **Blueprint**.
-3. Select `daniyal-arqam/FoodLoop`, branch `main`.
-4. When prompted for **MONGODB_URI**, paste the Atlas URI (same value for auth, food, and org — three times).
-5. Apply the Blueprint. First Docker builds can take 15–25 minutes. OpenAI is optional; the demo LLM works without a key. After the first push of `.github/workflows/keepalive.yml`, GitHub Actions should show a **Keepalive** workflow (Actions tab). Confirm **foodloop-keepalive** is running only if you kept the paid Starter worker; the six API services can stay on free.
-6. Open the **foodloop-gateway** service → copy its public URL, for example `https://foodloop-gateway.onrender.com`.
-7. Check `https://YOUR-GATEWAY.onrender.com/health` — you want `{ "success": true, ... }`. If it times out, wait and retry (cold start).
-
-If a service is **OOM** (often `foodloop-ai` on 512 MB), bump only that service to the Starter plan.
-
-## 4. Vercel (frontend)
-
-1. Sign up at [https://vercel.com](https://vercel.com) with GitHub.
-2. **Add New** → **Project** → `FoodLoop`.
-3. **Root Directory** → `frontend` (Edit, not the repo root).
-4. Framework: Vite. Build: `npm run build`. Output: `dist`.
-5. **Environment Variables**:
-
-| Name | Value |
-|------|--------|
-| `VITE_API_BASE_URL` | the Render gateway URL, no trailing slash |
-| `VITE_GOOGLE_CLIENT_ID` | Google Cloud OAuth Web client ID (same value as auth `GOOGLE_CLIENT_ID`) |
-
-6. Deploy. Copy the frontend URL, for example `https://foodloop-xxx.vercel.app`.
-
-If you set `VITE_API_BASE_URL` after the first deploy, **Redeploy** so Vite bakes the gateway URL into the JS bundle.
-
-## 4b. Continue with Google
-
-Google sign-in is real OAuth (ID token → auth-service). It is not a mock button.
-
-1. Open [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials → Create credentials → **OAuth client ID** → Application type **Web application**.
-2. Authorized JavaScript origins: `http://localhost:5173` and your Vercel URL (no trailing slash).
-3. Copy the Client ID.
-4. Vercel → Project → Settings → Environment Variables → `VITE_GOOGLE_CLIENT_ID` = that Client ID → Redeploy.
-5. Render → `foodloop-auth` → Environment → `GOOGLE_CLIENT_ID` = the **same** Client ID → Save (auth service restarts).
-
-New Google users are created as Provider unless they pick Organization on Sign in / Register first. Existing email accounts with the same Google email are signed in without changing role.
-
-## 5. Seed demo accounts
-
-On your laptop (auth-service `npm install` already done from local setup):
-
-```powershell
-cd C:\Users\user\OneDrive\Desktop\FoodLoop
-$env:GATEWAY_URL="https://YOUR-GATEWAY.onrender.com"
-$env:MONGODB_URI="mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/foodloop?retryWrites=true&w=majority"
-node scripts/demo/seed-cli.js
-```
-
-Then log in on the Vercel URL using [DEMO.md](./DEMO.md) accounts.
-
-## 6. What to submit
+## What to submit
 
 | Item | URL |
 |------|-----|
 | Live app | Vercel frontend |
-| API (optional) | `https://YOUR-GATEWAY.onrender.com/health` |
+| API (optional) | `http://YOUR_VM_IP:8080/health` |
 | GitHub | `https://github.com/daniyal-arqam/FoodLoop` |
 
 Judges should use the **Vercel** link, not localhost.
+
+## Google sign-in
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → OAuth client (Web).
+2. Authorized JavaScript origins: `http://localhost:5173` and your Vercel URL.
+3. Same Client ID in VPS `.env` (`GOOGLE_CLIENT_ID`) and Vercel (`VITE_GOOGLE_CLIENT_ID`).
+
+## Seed demo accounts
+
+```powershell
+$env:GATEWAY_URL="http://YOUR_VM_IP:8080"
+node scripts/demo/seed-cli.js
+```
+
+Then log in with [DEMO.md](./DEMO.md) accounts.
 
 ## If something fails
 
 | Symptom | Likely fix |
 |---------|------------|
-| Vercel UI loads, login fails | `VITE_API_BASE_URL` missing or wrong — set it and redeploy frontend |
-| Gateway 502 | A backend is still building or asleep — wait for GitHub Actions **Keepalive** (or `foodloop-keepalive`) to ping, then open each `/health` |
-| Atlas connection error | Network Access `0.0.0.0/0`; password encoded in the URI |
-| Seed cannot create admin | `MONGODB_URI` must be the Atlas URI, not localhost |
-| CORS errors | Shared group already uses `CORS_ORIGINS=*`; wait for gateway restart |
+| Vercel UI loads, login fails | `VITE_API_BASE_URL` wrong — set droplet/VM gateway URL and redeploy frontend |
+| Curl to `:8080` times out | Oracle VCN / Security List missing ingress TCP 8080 (and 22) |
+| Containers restart / OOM | Use at least ~6–12 GB RAM on Ampere (or 2 GB on x86 Student Pack droplets) |
+| Google sign-in broken | Same Client ID on VPS + Vercel; JS origin = Vercel URL |
+| JWT errors after recreate | Keep the same `JWT_SECRET` in `.env` across deploys |
