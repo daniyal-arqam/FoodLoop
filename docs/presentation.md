@@ -2,7 +2,7 @@
 
 Speaker notes for a live walkthrough. Author: Daniyal Arqam.
 
-1. **Problem (30s)** — Surplus kitchens and hungry community orgs do not share a listing/claim system. SDG 2, 11, 12, 13. No payments.
+1. **Problem (30s)** — Surplus kitchens and community orgs do not share a listing/claim system. FoodLoop is coordination only — no payments.
 
 2. **Solution (30s)** — FoodLoop: Provider lists food, Admin verifies orgs, Organization claims and collects. Status Available → Reserved → Collected.
 

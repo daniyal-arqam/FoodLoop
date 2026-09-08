@@ -50,9 +50,10 @@ See the root `.env.example` and `README.md`.
 
 Deterministic accounts and listings: `./scripts/seed-demo.sh`. Walkthrough: [DEMO.md](./DEMO.md).
 
-## Submission docs (PS-04)
+## More docs
 
 - [FYP.md](./FYP.md) — problem, users, future work
+- [LIVE.md](./LIVE.md) — live demo URLs and hosting
 - [architecture.svg](./architecture.svg) / [architecture.png](./architecture.png)
 - [database-schema.md](./database-schema.md) / [database-schema.svg](./database-schema.svg) / [database-schema.png](./database-schema.png)
 - [api-documentation.md](./api-documentation.md) / [api-documentation.html](./api-documentation.html) (print to PDF)

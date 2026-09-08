@@ -1,150 +1,136 @@
 # FoodLoop
 
-I built FoodLoop for LoopLearn Hackathon 2026 (PS-04): leftover food from kitchens should reach nearby community organizations the same day, not sit in a chat thread until it expires.
+**Live demo:** [https://food-loop-theta.vercel.app](https://food-loop-theta.vercel.app)
 
-Providers list surplus food. An admin verifies organizations. Those orgs browse listings, see a Python match score, claim a pickup, and mark it collected. The AI pages (waste advice, food-safety Q&A, matching help) call the same live APIs — they are not a mocked chatbot.
+FoodLoop is a food-rescue app. When a kitchen has edible surplus, it lists it. Verified community organizations nearby can find that listing, see a match score, claim a pickup, and mark it collected before the food expires.
 
-**Author:** Daniyal Arqam
+I built it because that coordination usually happens in WhatsApp threads — people forget, listings go stale, and good food gets thrown out. FoodLoop keeps one shared listing status so the same tray cannot be claimed twice.
 
-Demo walkthrough: [docs/DEMO.md](docs/DEMO.md).
+**Author:** Daniyal Arqam · [GitHub](https://github.com/daniyal-arqam/FoodLoop)
 
-## Architecture
+---
 
-| Component | Stack | Default port | Health |
-|-----------|--------|--------------|--------|
-| Frontend | React (Vite) | 5173 | `GET /health.json` |
-| API Gateway | Node.js + Express | 8080 | `GET /health` |
-| Auth Service | Node.js + Express | 4001 | `GET /health` |
-| Food Service | Node.js + Express | 4002 | `GET /health` |
-| Organization Service | Node.js + Express | 4003 | `GET /health` |
-| Matcher | Python FastAPI | 8001 | `GET /health` |
-| AI Service | Python FastAPI | 8002 | `GET /health` |
-| MongoDB | MongoDB | 27017 | — |
+## Try it live
 
-## Prerequisites
+| | URL |
+|--|-----|
+| App | [https://food-loop-theta.vercel.app](https://food-loop-theta.vercel.app) |
+| API health | [https://129.146.96.27.sslip.io/health](https://129.146.96.27.sslip.io/health) |
 
-- Node.js 20+
-- Python 3.11+
-- MongoDB (later phases)
-- Docker + Docker Compose (optional; used for containerized runs)
+Frontend runs on **Vercel**. Backend (API gateway, auth, food, organizations, matcher, AI, MongoDB) runs on an **Oracle Always Free** VM with Docker — it stays up without the idle sleep you get on free PaaS hosts.
 
-## Quick start (local, no Docker)
+Demo logins (after seeding, or use Register / Google):
 
-Copy environment defaults:
+| Role | Email | Password |
+|------|--------|----------|
+| Provider | ayesha.provider@example.com | Password1 |
+| Organization | kitchen.org@example.com | Password1 |
+| Admin | admin@foodloop.org | AdminPass1 |
+
+Seed walkthrough: [docs/DEMO.md](docs/DEMO.md).
+
+---
+
+## What it does
+
+- **Providers** publish surplus (quantity, category, pickup window, expiry).
+- **Admins** verify community organizations before they can claim.
+- **Organizations** browse available food, see a Python match score (distance, quantity, category, urgency), reserve a listing, then mark it collected.
+- **FoodLoop AI** helps with waste advice, food-safety Q&A (RAG over a small knowledge base), and matching help — all against the same live APIs, not a fake chat.
+
+Listing lifecycle: `Available` → `Reserved` → `Collected` (or `Expired`).
+
+---
+
+## Tech stack
+
+| Layer | What I used |
+|--------|-------------|
+| Frontend | React 18, Vite, React Router, GSAP, plain CSS |
+| API edge | Node.js + Express gateway (JWT at the edge, proxies to services) |
+| Services | Auth, food, organization — Node.js + Express + Mongoose |
+| Matching | Python FastAPI (`FoodMatcher` scoring) |
+| AI | Python FastAPI, FAISS RAG, optional OpenAI (works without a key via a demo LLM) |
+| Database | MongoDB |
+| Auth | JWT (HS256), bcrypt passwords, Google sign-in (ID token) |
+| Local / VPS | Docker Compose |
+| Optional | Kubernetes manifests, Terraform for cluster scaffolding |
+| Live hosting | Vercel (UI) + Oracle Always Free Ampere VM (APIs + Mongo) + Caddy HTTPS |
+
+---
+
+## Architecture (short)
+
+The browser only talks to the **API gateway**. Behind it:
+
+```
+Frontend (Vercel)
+    → API Gateway
+        → Auth service
+        → Food service
+        → Organization service
+        → Matcher (Python)
+        → AI service (Python)
+    → MongoDB
+```
+
+More detail: [docs/architecture.md](docs/architecture.md).
+
+---
+
+## Run locally
+
+**Need:** Node.js 20+, Python 3.11+, MongoDB (or Docker).
 
 ```bash
 cp .env.example .env
-```
-
-What each variable means, what is secret, and what to set on Vercel / your VPS: [docs/ENV.md](docs/ENV.md).
-
-Install Node dependencies:
-
-```bash
-npm install --prefix services/api-gateway
-npm install --prefix services/auth-service
-npm install --prefix services/food-service
-npm install --prefix services/organization-service
-npm install --prefix frontend
-```
-
-Create Python virtualenvs and install:
-
-```bash
-python -m venv python-services/matcher/.venv
-python-services/matcher/.venv/Scripts/pip install -r python-services/matcher/requirements.txt
-
-python -m venv ai-service/.venv
-ai-service/.venv/Scripts/pip install -r ai-service/requirements.txt
-```
-
-On macOS/Linux, use `python-services/matcher/.venv/bin/pip` and `ai-service/.venv/bin/pip`.
-
-Start each service from its directory (`npm start` or `uvicorn`), or use the automation scripts:
-
-```bash
-chmod +x scripts/*.sh
 ./scripts/setup.sh
 ./scripts/dev.sh
 ```
 
-`./scripts/test.sh` runs frontend, backend, and Python tests. `./scripts/build.sh` builds the frontend (and Docker images when Docker is available). `./scripts/deploy.sh` applies Kubernetes manifests.
+Windows PowerShell: `.\scripts\start-local.ps1`.
 
-On Windows PowerShell you can still use `.\scripts\start-local.ps1`. Git Bash can run the `.sh` scripts directly.
+Then open http://localhost:5173. Health check: `.\scripts\health-check.ps1` or `./scripts/health-check.sh`.
 
-Verify health:
+Env notes: [docs/ENV.md](docs/ENV.md).
 
-```bash
-# Windows
-.\scripts\health-check.ps1
-
-# macOS / Linux
-./scripts/health-check.sh
-```
-
-## Docker Compose
-
-Requires Docker. From the repository root:
+### Docker Compose
 
 ```bash
 docker compose build
 docker compose up
 ```
 
-Health endpoints (also used by Compose healthchecks):
-
-| Service | URL |
-|---------|-----|
-| Frontend | `http://localhost:5173/health.json` |
-| API Gateway | `http://localhost:8080/health` |
-| Auth | `http://localhost:4001/health` |
-| Food | `http://localhost:4002/health` |
-| Organizations | `http://localhost:4003/health` |
-| Matcher | `http://localhost:8001/health` |
-| AI | `http://localhost:8002/health` |
-
-Set `JWT_SECRET` in `.env` (do not put secrets in Dockerfiles). `OPENAI_API_KEY` is optional; the AI health endpoint works without it.
-
-## Kubernetes
-
-Manifests live in [infrastructure/kubernetes](infrastructure/kubernetes/README.md).
-
-```bash
-kubectl apply -f infrastructure/kubernetes/namespace.yaml
-kubectl apply -f infrastructure/kubernetes/configmap.yaml
-kubectl apply -f infrastructure/kubernetes/secrets.example.yaml
-kubectl apply -f infrastructure/kubernetes/
-kubectl get pods -n foodloop
-kubectl get services -n foodloop
-kubectl logs -n foodloop deploy/api-gateway
-```
-
-## Terraform
-
-Cluster environment (namespace, ConfigMap, Secret, MongoDB PVC, quota) is in [infrastructure/terraform](infrastructure/terraform/README.md). It targets an existing kubeconfig; it does not create a cloud account.
-
-```bash
-cd infrastructure/terraform
-terraform init
-terraform fmt
-terraform validate
-# terraform plan / apply only when a real cluster is available
-```
-
-## Repository layout
-
-See [docs/architecture.md](docs/architecture.md). Diagrams, API notes, and a short write-up live in `docs/`.
-
-## Hackathon demo
-
-With the stack running (`./scripts/dev.sh`):
+### Seed sample data
 
 ```bash
 ./scripts/seed-demo.sh
 ```
 
-Open http://localhost:5173 and follow [docs/DEMO.md](docs/DEMO.md) for the seeded demo accounts.
+---
 
-Live (Vercel frontend + always-on VPS APIs): [docs/LIVE.md](docs/LIVE.md) · [docs/DEPLOY-VPS.md](docs/DEPLOY-VPS.md).
+## Deploy / live ops
 
+- Overview: [docs/LIVE.md](docs/LIVE.md)
+- Oracle / VPS steps: [docs/DEPLOY-VPS.md](docs/DEPLOY-VPS.md)
 
+VPS profile publishes only the gateway (and optional Caddy for HTTPS). Frontend stays on Vercel with `VITE_API_BASE_URL` pointing at the public API.
+
+---
+
+## Docs
+
+| Doc | About |
+|-----|--------|
+| [DEMO.md](docs/DEMO.md) | How to walk through a full demo |
+| [architecture.md](docs/architecture.md) | Services and ports |
+| [api-documentation.md](docs/api-documentation.md) | Gateway APIs |
+| [database-schema.md](docs/database-schema.md) | Mongo collections |
+| [SECURITY.md](docs/SECURITY.md) | Auth, RBAC, secrets |
+| [FYP.md](docs/FYP.md) | Problem statement and future ideas |
+
+---
+
+## License / notes
+
+Personal / portfolio project. Do not commit real `.env` files or Atlas passwords.

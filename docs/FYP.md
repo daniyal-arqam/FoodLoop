@@ -1,6 +1,6 @@
 # FoodLoop — problem, users, and future work
 
-LoopLearn Hackathon 2026 · PS-04 Smart Food Rescue (SDG 2, 11, 12, 13).  
+Smart food rescue — leftover meals to verified community kitchens before they expire.  
 Author: Daniyal Arqam
 
 ## Problem

@@ -18,7 +18,7 @@ async function main() {
 
   process.stdout.write(`Waiting for API gateway at ${gatewayUrl}/health …\n`);
   await waitForGateway(gatewayUrl);
-  process.stdout.write("Seeding deterministic hackathon demo data…\n");
+  process.stdout.write("Seeding deterministic demo data…\n");
 
   const result = await seedDemo({ gatewayUrl, mongoUri, resetListings: true, createListing: true });
 

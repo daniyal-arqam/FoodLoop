@@ -1,6 +1,6 @@
 # FoodLoop security
 
-This document describes the security controls that are implemented in the repository, what was tightened in the latest audit, and the residual risks that remain for a hackathon / local-cluster deployment.
+This document describes the security controls that are implemented in the repository, what was tightened in the latest audit, and the residual risks that remain for a demo / local-cluster deployment.
 
 The public edge is the API gateway (`http://localhost:8080` in Docker Compose). The React app talks only to the gateway. Auth, food, organization, matcher, and AI services are intended to sit on the private network.
 
@@ -70,7 +70,7 @@ Never commit real `JWT_SECRET` or `OPENAI_API_KEY` values.
 ## Docker, Kubernetes, Terraform
 
 - Services bind `0.0.0.0` inside containers so Compose and Kubernetes probes work. Do not publish auth/food/org/matcher/AI ports on a public interface in production; only the gateway (and frontend) should be reachable.
-- Kubernetes Secrets hold `JWT_SECRET` and optional `OPENAI_API_KEY`. ConfigMap holds non-secret URLs and tunables, including `CORS_ORIGINS: "*"` for hackathon NodePort. Change that to the real frontend origin before a public launch.
+- Kubernetes Secrets hold `JWT_SECRET` and optional `OPENAI_API_KEY`. ConfigMap holds non-secret URLs and tunables, including `CORS_ORIGINS: "*"` for open demos. Change that to the real frontend origin before a locked-down public launch.
 - `./scripts/deploy.sh` requires `infrastructure/kubernetes/secrets.yaml` (copy from `secrets.example.yaml`). It will not apply the placeholder Secret.
 - Terraform creates the namespace, ConfigMap, and Secret template. It does not print secret values in outputs.
 

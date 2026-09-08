@@ -1,6 +1,8 @@
-# Hackathon demo runbook
+# Demo runbook
 
-Repeatable end-to-end demo for LoopLearn Hackathon 2026 (PS-04). Every food, matcher, and AI step uses live backend data — not a mocked chatbot.
+Repeatable end-to-end walkthrough of FoodLoop. Every food, matcher, and AI step uses live backend data — not a mocked chatbot.
+
+**Live app:** [https://food-loop-theta.vercel.app](https://food-loop-theta.vercel.app)
 
 ## Start the stack
 
@@ -72,4 +74,4 @@ Re-run `./scripts/seed-demo.sh` to reset those listings and start clean.
 
 ## Automated check
 
-`./scripts/test.sh` includes `tests/e2e/hackathon-demo.test.js`, which seeds the same accounts (plus the leftover Available listing) and walks listing → matcher breakdown → claim → collect → advisor → RAG → matching agent against a clean in-memory stack.
+`./scripts/test.sh` includes `tests/e2e/demo-flow.test.js`, which seeds the same accounts (plus the leftover Available listing) and walks listing → matcher breakdown → claim → collect → advisor → RAG → matching agent against a clean in-memory stack.

@@ -9,7 +9,7 @@ function assertOk(result, label) {
   assert.ok(result.status >= 200 && result.status < 300, `${label} status ${result.status}`);
 }
 
-describe("hackathon demo flow", { concurrency: false }, () => {
+describe("demo flow", { concurrency: false }, () => {
   let stack;
   let ai;
 

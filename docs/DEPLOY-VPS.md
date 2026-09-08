@@ -1,4 +1,4 @@
-# Deploy backends on an always-on VPS (leave Render)
+# Deploy backends on an always-on VPS
 
 Recommended live stack for FoodLoop:
 
@@ -8,7 +8,7 @@ Recommended live stack for FoodLoop:
 | APIs (gateway + auth + food + org + matcher + AI + Mongo) | **Oracle Cloud Always Free** Ampere VM (recommended) or Student Pack DigitalOcean / Azure | Free / student credits |
 | Optional DB hosted | MongoDB Atlas M0 | Free (only if you skip Compose Mongo) |
 
-Render free services **sleep**. A small always-on VM does not, so you do not need Render keepalive workers.
+A small always-on VM does not sleep between requests the way free PaaS web services often do.
 
 Use the same Compose files on any Docker host:
 
@@ -185,17 +185,6 @@ docker compose -f docker-compose.yml -f docker-compose.vps.yml --profile https u
 
 ---
 
-## Turn off Render
-
-In the [Render dashboard](https://dashboard.render.com):
-
-1. Delete or suspend every `foodloop-*` web service and the old `foodloop-keepalive` worker.
-2. Disable the GitHub **Keepalive** workflow if you still have it (Actions → Keepalive → Disable), or leave it only after setting `KEEPALIVE_GATEWAY_URL` to your VPS URL.
-
-`render.yaml` has been removed from this repo. Live traffic should use the VPS.
-
----
-
 ## Updates after `git push`
 
 On the VM:
@@ -219,9 +208,9 @@ git pull
 | `JWT` errors after recreate | Keep the same `JWT_SECRET` in `.env` across deploys |
 | Oracle “Out of capacity” for Ampere | Retry another region (e.g. Phoenix, Frankfurt) or smaller shape |
 
-## Why this instead of Render free
+## Why a VPS
 
-- No 15-minute idle sleep
+- No idle sleep between requests
 - One `docker compose` matches local/dev
-- Oracle Always Free stays on without a paid worker
+- Oracle Always Free can stay on without a paid worker
 - Frontend stays on free Vercel

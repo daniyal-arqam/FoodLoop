@@ -17,7 +17,7 @@ variable "namespace" {
 }
 
 variable "environment" {
-  description = "Deployment environment label (local, hackathon, staging)."
+  description = "Deployment environment label (local, staging, production)."
   type        = string
   default     = "local"
 }
@@ -199,13 +199,13 @@ variable "match_weight_urgency" {
 }
 
 variable "quota_cpu" {
-  description = "Namespace CPU quota (hackathon-sized)."
+  description = "Namespace CPU quota (demo-sized)."
   type        = string
   default     = "4"
 }
 
 variable "quota_memory" {
-  description = "Namespace memory quota (hackathon-sized)."
+  description = "Namespace memory quota (demo-sized)."
   type        = string
   default     = "4Gi"
 }

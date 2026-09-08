@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640">
   <rect width="1100" height="640" fill="#f4f0e8"/>
-  <text x="40" y="40" font-family="Segoe UI, sans-serif" font-size="22" fill="#1c241d">FoodLoop architecture (PS-04)</text>
+  <text x="40" y="40" font-family="Segoe UI, sans-serif" font-size="22" fill="#1c241d">FoodLoop architecture</text>
   <text x="40" y="64" font-family="Segoe UI, sans-serif" font-size="13" fill="#5b675e">React talks only to the API gateway. JWT on /api/foods, /api/organizations, /api/matching, /api/ai.</text>
   <g font-family="Segoe UI, sans-serif" font-size="14" text-anchor="middle">
     <rect x="380" y="90" width="340" height="56" rx="8" fill="#fffdf8" stroke="#1f6b45" stroke-width="2"/>

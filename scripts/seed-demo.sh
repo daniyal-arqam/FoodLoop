@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Seed deterministic FoodLoop hackathon demo users, orgs, and one Available listing.
+# Seed deterministic FoodLoop demo users, orgs, and sample listings.
 set -euo pipefail
 
 # shellcheck source=lib.sh

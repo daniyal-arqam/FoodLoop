@@ -10,7 +10,7 @@
 | `start-local.ps1` / `start-local.sh` | Same as `dev.sh` (Windows / Unix) |
 | `health-check.ps1` / `health-check.sh` | Hit every health endpoint |
 | `keepalive.js` | Optional health ping for a live gateway URL (GitHub Actions) |
-| `seed-demo.sh` | Deterministic hackathon users, verified orgs, and Available listings |
+| `seed-demo.sh` | Deterministic demo users, verified orgs, and Available listings |
 | `demo/promote-admin.js` | Force `admin@foodloop.org` to Admin on Atlas (`MONGODB_URI`) |
 | `start-mongo-memory.sh` | In-memory MongoDB on 27017 when Docker / local mongod is missing |
 
