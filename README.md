@@ -130,7 +130,3 @@ VPS profile publishes only the gateway (and optional Caddy for HTTPS). Frontend 
 | [FYP.md](docs/FYP.md) | Problem statement and future ideas |
 
 ---
-
-## License / notes
-
-Personal / portfolio project. Do not commit real `.env` files or Atlas passwords.
