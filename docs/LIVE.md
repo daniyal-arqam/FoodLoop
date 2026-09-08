@@ -12,15 +12,15 @@ Full VM setup: [DEPLOY-VPS.md](./DEPLOY-VPS.md).
 
 Do not commit filled `.env` files or database passwords.
 
-## Live links
+## Live links (operators)
 
 | Item | URL |
 |------|-----|
 | App | https://food-loop-theta.vercel.app |
-| API health | https://129.146.96.27.sslip.io/health |
+| API health | Set after deploy (HTTPS gateway / Caddy). Do not commit raw IPs with secrets. |
 | GitHub | https://github.com/daniyal-arqam/FoodLoop |
 
-If the VM public IP changes, update `GATEWAY_DOMAIN` / Caddy and set Vercel `VITE_API_BASE_URL` to the new HTTPS base, then redeploy the frontend.
+Prefer documenting the API base only in private notes or Vercel env. If you must publish a health URL, use your HTTPS hostname — never paste `JWT_SECRET`, Mongo URIs, or API keys into the README.
 
 ## Quick path (new VPS)
 
@@ -38,7 +38,7 @@ If the VM public IP changes, update `GATEWAY_DOMAIN` / Caddy and set Vercel `VIT
 ## Seed demo accounts
 
 ```powershell
-$env:GATEWAY_URL="https://129.146.96.27.sslip.io"
+$env:GATEWAY_URL="https://YOUR_API_HOST"
 node scripts/demo/seed-cli.js
 ```
 
